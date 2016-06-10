@@ -4,6 +4,7 @@ all: $(CONTIKI_PROJECT)
 CONTIKI=../../../..
 CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
 
+CONTIKI_WITH_IPV6 = 1
 # automatically build RESTful resources
 # REST_RESOURCES_DIR = ./resources
 # ifndef TARGET
@@ -26,7 +27,7 @@ SMALL=1
 # APPS += er-coap
 # APPS += rest-engine
 
-CONTIKI_WITH_IPV6 = 1
+
 
 
 #CFLAGS += -DWITH_COAP

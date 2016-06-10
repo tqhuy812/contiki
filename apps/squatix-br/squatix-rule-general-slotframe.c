@@ -7,23 +7,36 @@
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
-#if SQUATIX_DATA_SENDER_BASED && SQUATIX_COLLISION_FREE_HASH
-#define DATA_SLOT_SHARED_FLAG    ((SQUATIX_DATA_PERIOD < (SQUATIX_MAX_HASH + 1)) ? LINK_OPTION_SHARED : 0)
+
+#if SQUATIX_GENERAL_SENDER_BASED && SQUATIX_COLLISION_FREE_HASH
+#define GENERAL_SLOT_SHARED_FLAG    ((SQUATIX_GENERAL_PERIOD < (SQUATIX_MAX_HASH + 1)) ? LINK_OPTION_SHARED : 0)
 #else
-#define DATA_SLOT_SHARED_FLAG      LINK_OPTION_SHARED
+#define GENERAL_SLOT_SHARED_FLAG      LINK_OPTION_SHARED
 #endif
 
 static uint16_t slotframe_handle = 0;
 static uint16_t channel_offset = 0;
 
-static struct tsch_slotframe *sf_data;
+static struct tsch_slotframe *sf_general;
 
-// Because of the One-SF design, use the common shared cell for both EB and non-EB traffic \
+// Because of the General-SF design, use the common shared cell for both EB and non-EB traffic \
 // (inteded for RPL packets but not CoAP packets)
-#define SQUATIX_DATA_SLOTFRAME_TYPE              LINK_TYPE_NORMAL
+#define SQUATIX_GENERAL_SLOTFRAME_TYPE              LINK_TYPE_ADVERTISING
 
 /////////End of declaration/////////////////
 
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+static uint16_t
+get_node_timeslot(const linkaddr_t *addr)
+{
+  if(addr != NULL && SQUATIX_GENERAL_SLOTFRAME_PERIOD > 0) {
+    PRINTF("hash: [%d]",SQUATIX_LINKADDR_HASH(addr));
+    return SQUATIX_LINKADDR_HASH(addr) % SQUATIX_GENERAL_SLOTFRAME_PERIOD;
+  } else {
+    return 0xffff;
+  }
+}
 /*---------------------------------------------------------------------------*/
 static int
 select_packet(uint16_t *slotframe, uint16_t *timeslot)
@@ -33,35 +46,23 @@ select_packet(uint16_t *slotframe, uint16_t *timeslot)
     *slotframe = slotframe_handle;
   }
   if(timeslot != NULL) {
-    *timeslot = 1;
+    *timeslot = 0;
   }
-  return 0;
-}
-/*---------------------------------------------------------------------------*/
-static uint16_t
-get_node_timeslot(const linkaddr_t *addr)
-{
-  if(addr != NULL && SQUATIX_DATA_SLOTFRAME_PERIOD > 0) {
-    PRINTF("hash: [%d]",SQUATIX_LINKADDR_HASH(addr));
-    return SQUATIX_LINKADDR_HASH(addr) % SQUATIX_DATA_SLOTFRAME_PERIOD;
-  } else {
-    return 0xffff;
-  }
+  return 1;
 }
 /*---------------------------------------------------------------------------*/
 // static int
 // select_packet(uint16_t *slotframe, uint16_t *timeslot)
 // {
-//   /* Select data packets we have a unicast link to */
+//   /* Select GENERAL packets we have a unicast link to */
 //   const linkaddr_t *dest = packetbuf_addr(PACKETBUF_ADDR_RECEIVER);
-//   if(packetbuf_attr(PACKETBUF_ATTR_FRAME_TYPE) == FRAME802154_DATAFRAME
+//   if(packetbuf_attr(PACKETBUF_ATTR_FRAME_TYPE) == FRAME802154_GENERALFRAME
 //      && neighbor_has_uc_link(dest)) {
 //     if(slotframe != NULL) {
 //       *slotframe = slotframe_handle;
 //     }
 //     if(timeslot != NULL) {
-//       *timeslot = SQUATIX_DATA_SENDER_BASED ? get_node_timeslot(&linkaddr_node_addr) : get_node_timeslot(dest);
-//       //*timeslot = 0x0001;
+//       *timeslot = SQUATIX_GENERAL_SENDER_BASED ? get_node_timeslot(&linkaddr_node_addr) : get_node_timeslot(dest);
 //     }
 //     return 1;
 //   }
@@ -72,7 +73,7 @@ static int
 neighbor_has_uc_link(const linkaddr_t *linkaddr)
 {
   if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
-    if((squatix_parent_knows_us || !SQUATIX_DATA_SENDER_BASED)
+    if((squatix_parent_knows_us || !SQUATIX_GENERAL_SENDER_BASED)
        && linkaddr_cmp(&squatix_parent_linkaddr, linkaddr)) {
       return 1;
     }
@@ -88,18 +89,20 @@ add_uc_link(const linkaddr_t *linkaddr)
 {
   if(linkaddr != NULL) {
     uint16_t timeslot = get_node_timeslot(linkaddr);
-    uint8_t link_options = SQUATIX_DATA_SENDER_BASED ? LINK_OPTION_RX : LINK_OPTION_TX | DATA_SLOT_SHARED_FLAG;
+    uint8_t link_options = SQUATIX_GENERAL_SENDER_BASED ? LINK_OPTION_RX : LINK_OPTION_TX | GENERAL_SLOT_SHARED_FLAG;
 
     if(timeslot == get_node_timeslot(&linkaddr_node_addr)) {
       /* This is also our timeslot, add necessary flags */
-      link_options |= SQUATIX_DATA_SENDER_BASED ? LINK_OPTION_TX | DATA_SLOT_SHARED_FLAG: LINK_OPTION_RX;
+      link_options |= SQUATIX_GENERAL_SENDER_BASED ? LINK_OPTION_TX | GENERAL_SLOT_SHARED_FLAG: LINK_OPTION_RX;
     }
 
     /* Add/update link */
-    tsch_schedule_add_link(sf_data, link_options, LINK_TYPE_NORMAL, &tsch_broadcast_address,
+    tsch_schedule_add_link(sf_general, link_options, LINK_TYPE_NORMAL, &tsch_broadcast_address,
           timeslot, channel_offset);
   }
 }
+//  tsch_schedule_add_link(sf_GENERAL,link_options, LINK_TYPE_NORMAL, &tsch_broad_cast_address,timeslot,channel_offset);
+
 /*---------------------------------------------------------------------------*/
 static void
 remove_uc_link(const linkaddr_t *linkaddr)
@@ -112,7 +115,7 @@ remove_uc_link(const linkaddr_t *linkaddr)
   }
 
   timeslot = get_node_timeslot(linkaddr);
-  l = tsch_schedule_get_link_by_timeslot(sf_data, timeslot);
+  l = tsch_schedule_get_link_by_timeslot(sf_general, timeslot);
   if(l == NULL) {
     return;
   }
@@ -136,14 +139,15 @@ remove_uc_link(const linkaddr_t *linkaddr)
   /* Do we need this timeslot? */
   if(timeslot == get_node_timeslot(&linkaddr_node_addr)) {
     /* This is our link, keep it but update the link options */
-    uint8_t link_options = SQUATIX_DATA_SENDER_BASED ? LINK_OPTION_TX | DATA_SLOT_SHARED_FLAG: LINK_OPTION_RX;
-    tsch_schedule_add_link(sf_data, link_options, LINK_TYPE_NORMAL, &tsch_broadcast_address,
+    uint8_t link_options = SQUATIX_GENERAL_SENDER_BASED ? LINK_OPTION_TX | GENERAL_SLOT_SHARED_FLAG: LINK_OPTION_RX;
+    tsch_schedule_add_link(sf_general, link_options, LINK_TYPE_NORMAL, &tsch_broadcast_address,
               timeslot, channel_offset);
   } else {
     /* Remove link */
-    tsch_schedule_remove_link(sf_data, l);
+    tsch_schedule_remove_link(sf_general, l);
   }
 }
+/*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 static void
 child_added(const linkaddr_t *linkaddr)
@@ -173,32 +177,6 @@ new_time_source(const struct tsch_neighbor *old, const struct tsch_neighbor *new
     add_uc_link(new_addr);
   }
 }
-/*---------------------------------------------------------------------------*/
-// static void
-// new_time_source(const struct tsch_neighbor *old, const struct tsch_neighbor *new)
-// {
-//   uint16_t old_ts = get_node_timeslot(&old->addr);
-//   uint16_t new_ts = get_node_timeslot(&new->addr);
-
-//   if(new_ts == old_ts) {
-//     return;
-//   }
-
-//   if(old_ts != 0xffff) {
-//     /* Stop listening to the old time source's EBs */
-//     tsch_schedule_remove_link_by_timeslot(sf_node, old_ts);
-//   }
-//   if(new_ts != 0xffff) {
-//     /* Listen to the time source's EBs */
-//     tsch_schedule_add_link(sf_node,
-//                            LINK_OPTION_RX,
-//                            LINK_TYPE_ADVERTISING_ONLY, NULL,
-//                            new_ts, channel_offset);
-//   }
-// }
-
-
-/*---------------------------------------------------------------------------*/
 //DESIGN SHARED CELL FIRST
 
 static void
@@ -207,33 +185,27 @@ init(uint16_t sf_handle)
   slotframe_handle = sf_handle;
   channel_offset = sf_handle;
   /* Slotframe for unicast transmissions */
-  sf_data = tsch_schedule_add_slotframe(slotframe_handle, SQUATIX_DATA_SLOTFRAME_PERIOD);
+  sf_general = tsch_schedule_add_slotframe(slotframe_handle, SQUATIX_GENERAL_SLOTFRAME_PERIOD);
 //  uint16_t timeslot = get_node_timeslot(&linkaddr_node_addr);
-  uint16_t timeslot = get_node_timeslot(&linkaddr_node_addr);
-  for (timeslot=0x0001; timeslot<SQUATIX_DATA_SLOTFRAME_PERIOD;timeslot++){
-    // tsch_schedule_add_link(sf_data,
-    //           SQUATIX_DATA_SENDER_BASED ? LINK_OPTION_TX | DATA_SLOT_SHARED_FLAG: LINK_OPTION_RX,
+  uint16_t timeslot;
+  for (timeslot=0x0000; timeslot<SQUATIX_GENERAL_SLOTFRAME_PERIOD;timeslot++){
+    // tsch_schedule_add_link(sf_GENERAL,
+    //           SQUATIX_GENERAL_SENDER_BASED ? LINK_OPTION_TX | GENERAL_SLOT_SHARED_FLAG: LINK_OPTION_RX,
     //           LINK_TYPE_NORMAL, &tsch_broadcast_address,
     //           timeslot, channel_offset);
-      tsch_schedule_add_link(sf_data,
+      tsch_schedule_add_link(sf_general,
               LINK_OPTION_RX | LINK_OPTION_TX | LINK_OPTION_SHARED,
-              LINK_TYPE_NORMAL, &tsch_broadcast_address,
-              timeslot, channel_offset);
+              LINK_TYPE_ADVERTISING, &tsch_broadcast_address,
+              timeslot-0x0001, channel_offset);
 
   }
 }
 
 /*---------------------------------------------------------------------------*/
-struct squatix_rule data_slotframe = {
-  // init,
-  // new_time_source,
-  // select_packet,
-  // child_added,
-  // child_removed,
+struct squatix_rule general_slotframe = {
   init,
   NULL,
   select_packet,
   NULL,
   NULL,
 };
-

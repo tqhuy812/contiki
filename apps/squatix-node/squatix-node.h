@@ -29,6 +29,7 @@ struct squatix_rule {
 //new TSCH schedule
 struct squatix_rule one_slotframe;
 struct squatix_rule data_slotframe;
+//struct squatix_rule general_slotframe;
 
 extern linkaddr_t squatix_parent_linkaddr;
 extern int squatix_parent_knows_us;

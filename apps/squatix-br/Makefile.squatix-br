@@ -1,1 +1,3 @@
 squatix-br_src = squatix-br.c squatix-rule-one-slotframe.c squatix-rule-br-data-slotframe.c
+#squatix-br_src = squatix-br.c squatix-rule-general-slotframe.c
+#squatix-br_src = squatix-br.c squatix-rule-one-slotframe.c

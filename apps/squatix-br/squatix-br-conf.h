@@ -19,7 +19,10 @@
  * - a sender-based or receiver-based slotframe for unicast to RPL parents and children
  * - a common shared slotframe for any other traffic (mostly broadcast)
  *  */
+
 #define SQUATIX_RULES {&one_slotframe, &data_slotframe}
+
+//#define SQUATIX_RULES {&general_slotframe}
 #endif /* SQUATIX_CONF_RULES */
 
 
@@ -32,24 +35,39 @@
 #ifdef SQUATIX_CONF_ONE_SLOTFRAME_PERIOD
 #define SQUATIX_ONE_SLOTFRAME_PERIOD                  SQUATIX_CONF_ONE_SLOTFRAME_PERIOD
 #else /* SQUATIX_CONF_ONE_SLOTFRAME_PERIOD */
-#define SQUATIX_ONE_SLOTFRAME_PERIOD                  5
+#define SQUATIX_ONE_SLOTFRAME_PERIOD                  7
 #endif /* SQUATIX_ONE_SLOTFRAME_PERIOD */
 
 #ifdef SQUATIX_CONF_DATA_SLOTFRAME_PERIOD
 #define SQUATIX_DATA_SLOTFRAME_PERIOD                  SQUATIX_CONF_DATA_SLOTFRAME_PERIOD
 #else /* SQUATIX_CONF_DATA_SLOTFRAME_PERIOD */
-#define SQUATIX_DATA_SLOTFRAME_PERIOD                  5
+#define SQUATIX_DATA_SLOTFRAME_PERIOD                  7
 #endif /* SQUATIX_DATA_SLOTFRAME_PERIOD */
+
+#ifdef SQUATIX_CONF_GENERAL_SLOTFRAME_PERIOD
+#define SQUATIX_GENERAL_SLOTFRAME_PERIOD                  SQUATIX_CONF_GENERAL_SLOTFRAME_PERIOD
+#else /* SQUATIX_CONF_GENERAL_SLOTFRAME_PERIOD */
+#define SQUATIX_GENERAL_SLOTFRAME_PERIOD                  7
+#endif /* SQUATIX_GENERAL_SLOTFRAME_PERIOD */
 
 /* Is the per-neighbor unicast slotframe sender-based (if not, it is receiver-based).
  * Note: sender-based works only with RPL storing mode as it relies on DAO and
  * routing entries to keep track of children and parents. */
+
 #ifdef SQUATIX_CONF_DATA_SENDER_BASED
 #define SQUATIX_DATA_SENDER_BASED            SQUATIX_CONF_DATA_SENDER_BASED
 #else /* SQUATIX_CONF_DATA_SENDER_BASED */
-#define SQUATIX_DATA_SENDER_BASED            0
+#define SQUATIX_DATA_SENDER_BASED            1
 #endif /* SQUATIX_CONF_DATA_SENDER_BASED */
 
+
+#if 0
+#ifdef SQUATIX_CONF_GENERAL_SENDER_BASED
+#define SQUATIX_GENERAL_SENDER_BASED            SQUATIX_CONF_GENERAL_SENDER_BASED
+#else /* SQUATIX_CONF_GENERAL_SENDER_BASED */
+#define SQUATIX_GENERAL_SENDER_BASED            0
+#endif /* SQUATIX_CONF_GENERAL_SENDER_BASED */
+#endif
 ///////// End of Using only one Slotframe, no need to declare several slotframes//////
 
 

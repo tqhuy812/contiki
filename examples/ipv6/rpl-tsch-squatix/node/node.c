@@ -184,7 +184,7 @@ PROCESS_THREAD(node_process, ev, data)
   static int is_coordinator = 0;
   static enum { role_6ln, role_6dr, role_6dr_sec } node_role;
   
- node_role = role_6ln;
+  node_role = role_6ln;
   
   /* Set node with ID == 1 as coordinator, convenient in Cooja. */
 
@@ -199,8 +199,8 @@ PROCESS_THREAD(node_process, ev, data)
     node_role = role_6ln;
   }
 
-  // printf("Init: node starting with role %s\n",
-  //     node_role == role_6ln ? "6ln" : (node_role == role_6dr) ? "6dr" : "6dr-sec");
+  printf("Init: node starting with role %s\n",
+      node_role == role_6ln ? "6ln" : (node_role == role_6dr) ? "6dr" : "6dr-sec");
 
   tsch_set_pan_secured(LLSEC802154_ENABLED && (node_role == role_6dr_sec));
   is_coordinator = node_role > role_6ln;
@@ -234,9 +234,9 @@ PROCESS_THREAD(node_process, ev, data)
   squatix_init();
 #endif /* WITH_SQUATIX */
 
-#if WITH_ORCHESTRA
-  orchestra_init();
-#endif /* WITH_ORCHESTRA */
+// #if WITH_ORCHESTRA
+//   orchestra_init();
+// #endif /* WITH_ORCHESTRA */
 
   /* Print out routing tables every minute */
   etimer_set(&et, CLOCK_SECOND * 60);

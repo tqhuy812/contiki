@@ -189,8 +189,10 @@ PROCESS_THREAD(node_process, ev, data)
     uip_ipaddr_t prefix;
     uip_ip6addr(&prefix, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 0);
     net_init(&prefix);
+    PRINTF("11111111111shjfhskf11111111111111111111111");
   } else {
     net_init(NULL);
+    PRINTF("22222222222222222222222222222222");
   }
   
 #if WITH_ORCHESTRA

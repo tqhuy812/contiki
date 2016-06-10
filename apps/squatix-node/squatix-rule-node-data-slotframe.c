@@ -24,37 +24,6 @@ static struct tsch_slotframe *sf_data;
 
 /////////End of declaration/////////////////
 
-/*--------------------------------)-------------------------------------------*/
-// static uint16_t
-// get_node_timeslot(const linkaddr_t *addr)
-// {
-// 	uint16_t next_timeslot[7],i,j; 
-// 	int k=0;
-// #if SQUATIX_ONE_SLOTFRAME > 0
-// 	for (i=2;i!=SQUATIX_ONE_SLOTFRAME; i++){
-// 		if (i==2){
-// 			next_timeslot[k]=i;
-// 			k++;
-// 		}
-// 		else { 
-// 			for (j=2;j!=i;j++){
-// 				if ((i%j)==0 ){
-// 					break;
-// 					}
-// 				else{
-// 					next_timeslot[k]=i;
-// 					k++;
-// 					break;
-// 				}
-// 			}
-// 		}
-// 	}
-//  return next_timeslot[(int)(random_rand() % sizeof(next_timeslot))];
-// #else
-//  return 0xffff;
-// #endif
-// }
-/*---------------------------------------------------------------------------*/
 static uint16_t
 get_node_timeslot(const linkaddr_t *addr)
 {
@@ -190,8 +159,6 @@ new_time_source(const struct tsch_neighbor *old, const struct tsch_neighbor *new
   }
 }
 /*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
-
 // static void
 // new_time_source(const struct tsch_neighbor *old, const struct tsch_neighbor *new)
 // {
@@ -215,7 +182,6 @@ new_time_source(const struct tsch_neighbor *old, const struct tsch_neighbor *new
 //   }
 // }
 /*---------------------------------------------------------------------------*/
-//DESIGN SHARED CELL FIRST
 
 static void
 init(uint16_t sf_handle)
@@ -224,23 +190,36 @@ init(uint16_t sf_handle)
   channel_offset = sf_handle;
   /* Slotframe for unicast transmissions */
   sf_data = tsch_schedule_add_slotframe(slotframe_handle, SQUATIX_DATA_SLOTFRAME_PERIOD);
-  uint16_t timeslot = get_node_timeslot(&linkaddr_node_addr);
+  uint16_t *timeslot_test;
+  timeslot_test = &timeslot;
   // tsch_schedule_add_link(sf_data,
   //           SQUATIX_DATA_SENDER_BASED ? LINK_OPTION_TX | DATA_SLOT_SHARED_FLAG: LINK_OPTION_RX,
   //           LINK_TYPE_NORMAL, &tsch_broadcast_address,
   //           timeslot, channel_offset);
     tsch_schedule_add_link(sf_data,
-            SQUATIX_DATA_SENDER_BASED ? LINK_OPTION_TX | DATA_SLOT_SHARED_FLAG: LINK_OPTION_RX,
+            //LINK_OPTION_RX | LINK_OPTION_TX | LINK_OPTION_SHARED,
+            LINK_OPTION_TX | LINK_OPTION_SHARED,
             LINK_TYPE_NORMAL, &tsch_broadcast_address,
-            timeslot, channel_offset);
+            *timeslot_test - 0x0001, channel_offset);
+
+    tsch_schedule_add_link(sf_data,
+            //LINK_OPTION_RX | LINK_OPTION_TX | LINK_OPTION_SHARED,
+            LINK_OPTION_RX | LINK_OPTION_SHARED,
+            LINK_TYPE_NORMAL, &tsch_broadcast_address,
+            *timeslot_test, channel_offset);
 }
 
 /*---------------------------------------------------------------------------*/
 struct squatix_rule data_slotframe = {
+  // init,
+  // new_time_source,
+  // select_packet,
+  // child_added,
+  // child_removed,
   init,
-  new_time_source,
+  NULL,
   select_packet,
-  child_added,
-  child_removed,
+  NULL,
+  NULL,
 };
 
