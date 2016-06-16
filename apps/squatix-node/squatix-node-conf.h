@@ -48,9 +48,7 @@
  *  */
 
 //#define SQUATIX_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_storing, &default_common }
-// #define SQUATIX_RULES { &default_common, &unicast_per_neighbor_rpl_storing}
-#define SQUATIX_RULES { &unicast_per_neighbor_rpl_storing, &default_common}
-
+#define SQUATIX_RULES { &unicast_per_neighbor_rpl_storing, &default_common }
 /* Example configuration for RPL non-storing mode: */
 /* #define SQUATIX_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_ns, &default_common } */
 

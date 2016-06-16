@@ -70,25 +70,25 @@ get_node_timeslot(const linkaddr_t *addr)
   }
 }
 /*---------------------------------------------------------------------------*/
-// static int
-// neighbor_has_uc_link(const linkaddr_t *linkaddr)
-// {
-//   //PRINTF("parent_has_uc_link");
-//   if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
-//     // PRINTF("parent_has_uc_link1");
-//     // if((squatix_parent_knows_us || !SQUATIX_UNICAST_SENDER_BASED)
-//     //    && linkaddr_cmp(&squatix_parent_linkaddr, linkaddr)) {
-//     //   PRINTF("parent_has_uc_link2");
-//     //   return 1;
-//     // }
-//     // if(nbr_table_get_from_lladdr(nbr_routes, (linkaddr_t *)linkaddr) != NULL) {
-//     //   PRINTF("othernodes_have_uc_link");
-//     //   return 1;
-//     // }
-//     return 1;
-//   }
-//   return 0;
-// }
+static int
+neighbor_has_uc_link(const linkaddr_t *linkaddr)
+{
+  //PRINTF("parent_has_uc_link");
+  if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
+    // PRINTF("parent_has_uc_link1");
+    // if((squatix_parent_knows_us || !SQUATIX_UNICAST_SENDER_BASED)
+    //    && linkaddr_cmp(&squatix_parent_linkaddr, linkaddr)) {
+    //   PRINTF("parent_has_uc_link2");
+    //   return 1;
+    // }
+    // if(nbr_table_get_from_lladdr(nbr_routes, (linkaddr_t *)linkaddr) != NULL) {
+    //   PRINTF("othernodes_have_uc_link");
+    //   return 1;
+    // }
+    return 1;
+  }
+  return 0;
+}
 /*---------------------------------------------------------------------------*/
 static void
 add_uc_link(const linkaddr_t *linkaddr)
