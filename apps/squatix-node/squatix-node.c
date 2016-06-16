@@ -158,9 +158,9 @@ squatix_init(void)
   /* Initialize all Orchestra rules */
   for(i = 0; i < NUM_RULES; i++) {
     if(all_rules[i]->init != NULL) {
-      PRINTF("Orchestra: initializing rule %u\n", i);
+      PRINTF("Squatix: initializing rule %u\n", i);
       all_rules[i]->init(i);
     }
   }
-  PRINTF("Orchestra: initialization done\n");
+  PRINTF("Squatix: initialization done\n");
 }

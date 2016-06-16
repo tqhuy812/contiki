@@ -16,7 +16,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#define DEBUG DEBUG_NONE
+// #define DEBUG DEBUG_NONE
+#define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
 #if WITH_SQUATIX
@@ -209,9 +210,6 @@ net_init(&prefix);
 
 //Add TSCH schedule here
 
-  etimer_set(&et, CLOCK_SECOND * 10); //Change to *30 to observe the Routing Table more frequently
-
-
   while(1) {
   print_network_status();
 //  tsch_schedule_init();
@@ -223,6 +221,10 @@ net_init(&prefix);
   #if WITH_ORCHESTRA
   orchestra_init();
 #endif /* WITH_ORCHESTRA */
+PRINTF("BR_TEST1");
+  etimer_set(&et, CLOCK_SECOND * 10); //Change to *30 to observe the Routing Table more frequently
+
+
 
   // sf = tsch_schedule_get_slotframe_by_handle(1);
 

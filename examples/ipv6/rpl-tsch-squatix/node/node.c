@@ -246,7 +246,7 @@ PROCESS_THREAD(node_process, ev, data)
 #if WITH_ORCHESTRA
   orchestra_init();
 #endif /* WITH_ORCHESTRA */
-  
+  PRINTF("NODE_TEST1");
 ///////////////////////////////////////////
 // if(ev == sensors_event) {
 //       PRINTF("*******BUTTON*******\n");
