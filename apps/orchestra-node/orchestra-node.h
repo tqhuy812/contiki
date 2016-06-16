@@ -41,7 +41,7 @@
 #include "net/mac/tsch/tsch.h"
 #include "net/mac/tsch/tsch-conf.h"
 #include "net/mac/tsch/tsch-schedule.h"
-#include "orchestra-conf.h"
+#include "orchestra-node-conf.h"
 
 /* The structure of an Orchestra rule */
 struct orchestra_rule {
@@ -53,7 +53,8 @@ struct orchestra_rule {
 };
 
 struct orchestra_rule eb_per_time_source;
-struct orchestra_rule unicast_per_neighbor;
+struct orchestra_rule unicast_per_neighbor_rpl_storing;
+struct orchestra_rule unicast_per_neighbor_rpl_ns;
 struct orchestra_rule default_common;
 
 extern linkaddr_t orchestra_parent_linkaddr;

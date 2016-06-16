@@ -46,7 +46,7 @@ obj_z1/squatix-node.o: ../../../../apps/squatix-node/squatix-node.c \
  ../../../../core/./net/llsec/llsec.h ../../../../core/./net/mac/rdc.h \
  ../../../../core/./net/mac/framer.h \
  ../../../../core/./net/ipv6/uip-ds6-nbr.h \
- ../../../../core/./sys/ctimer.h \
+ ../../../../core/./sys/ctimer.h ../../../../core/./net/rpl/rpl-ns.h \
  ../../../../core/./net/ipv6/multicast/uip-mcast6.h \
  ../../../../core/./net/ipv6/multicast/uip-mcast6-engines.h \
  ../../../../core/./net/ipv6/multicast/uip-mcast6-route.h \
@@ -102,7 +102,7 @@ obj_z1/squatix-node.o: ../../../../apps/squatix-node/squatix-node.c \
  ../../../../core/./net/llsec/llsec.h ../../../../core/./net/mac/rdc.h :
  ../../../../core/./net/mac/framer.h :
  ../../../../core/./net/ipv6/uip-ds6-nbr.h :
- ../../../../core/./sys/ctimer.h :
+ ../../../../core/./sys/ctimer.h ../../../../core/./net/rpl/rpl-ns.h :
  ../../../../core/./net/ipv6/multicast/uip-mcast6.h :
  ../../../../core/./net/ipv6/multicast/uip-mcast6-engines.h :
  ../../../../core/./net/ipv6/multicast/uip-mcast6-route.h :

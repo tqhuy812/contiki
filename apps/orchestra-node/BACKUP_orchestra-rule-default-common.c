@@ -36,7 +36,7 @@
  */
 
 #include "contiki.h"
-#include "orchestra.h"
+#include "orchestra-node.h"
 
 static uint16_t slotframe_handle = 0;
 static uint16_t channel_offset = 0;

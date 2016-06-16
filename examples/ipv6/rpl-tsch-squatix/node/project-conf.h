@@ -95,7 +95,7 @@
 
 /* RPL storing mode */
 // #undef RPL_CONF_MOP
-// #define RPL_CONF_MOP RPL_MOP_NON_STORING
+// #define RPL_CONF_MOP RPL_MOP_STORING_NO_MULTICAST
 /////////////////////////////////////////////////
 
 #undef ENABLE_COOJA_DEBUG

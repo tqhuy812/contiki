@@ -37,19 +37,19 @@
  */
 
 #include "contiki.h"
-#include "orchestra.h"
+#include "orchestra-node.h"
 #include "net/packetbuf.h"
 #include "net/ipv6/uip-icmp6.h"
 #include "net/rpl/rpl-private.h"
-#include "net/rime/rime.h" /* Needed for so-called rime-sniffer */
+// #include "net/rime/rime.h" /* Needed for so-called rime-sniffer */
 
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
 /* A net-layer sniffer for packets sent and received */
-static void orchestra_packet_received(void);
-static void orchestra_packet_sent(int mac_status);
-RIME_SNIFFER(orchestra_sniffer, orchestra_packet_received, orchestra_packet_sent);
+// static void orchestra_packet_received(void);
+// static void orchestra_packet_sent(int mac_status);
+//RIME_SNIFFER(orchestra_sniffer, orchestra_packet_received, orchestra_packet_sent);
 
 /* The current RPL preferred parent's link-layer address */
 linkaddr_t orchestra_parent_linkaddr;
@@ -61,25 +61,25 @@ const struct orchestra_rule *all_rules[] = ORCHESTRA_RULES;
 #define NUM_RULES (sizeof(all_rules) / sizeof(struct orchestra_rule *))
 
 /*---------------------------------------------------------------------------*/
-static void
-orchestra_packet_received(void)
-{
-}
+// static void
+// orchestra_packet_received(void)
+// {
+// }
 /*---------------------------------------------------------------------------*/
-static void
-orchestra_packet_sent(int mac_status)
-{
-  /* Check if our parent just ACKed a DAO */
-  if(orchestra_parent_knows_us == 0
-     && mac_status == MAC_TX_OK
-     && packetbuf_attr(PACKETBUF_ATTR_NETWORK_ID) == UIP_PROTO_ICMP6
-     && packetbuf_attr(PACKETBUF_ATTR_CHANNEL) == (ICMP6_RPL << 8 | RPL_CODE_DAO)) {
-    if(!linkaddr_cmp(&orchestra_parent_linkaddr, &linkaddr_null)
-       && linkaddr_cmp(&orchestra_parent_linkaddr, packetbuf_addr(PACKETBUF_ADDR_RECEIVER))) {
-      orchestra_parent_knows_us = 1;
-    }
-  }
-}
+// static void
+// orchestra_packet_sent(int mac_status)
+// {
+//   /* Check if our parent just ACKed a DAO */
+//   if(orchestra_parent_knows_us == 0
+//      && mac_status == MAC_TX_OK
+//      && packetbuf_attr(PACKETBUF_ATTR_NETWORK_ID) == UIP_PROTO_ICMP6
+//      && packetbuf_attr(PACKETBUF_ATTR_CHANNEL) == (ICMP6_RPL << 8 | RPL_CODE_DAO)) {
+//     if(!linkaddr_cmp(&orchestra_parent_linkaddr, &linkaddr_null)
+//        && linkaddr_cmp(&orchestra_parent_linkaddr, packetbuf_addr(PACKETBUF_ADDR_RECEIVER))) {
+//       orchestra_parent_knows_us = 1;
+//     }
+//   }
+// }
 /*---------------------------------------------------------------------------*/
 void
 orchestra_callback_child_added(const linkaddr_t *addr)
@@ -153,7 +153,7 @@ orchestra_init(void)
   int i;
   /* Snoop on packet transmission to know if our parent knows about us
    * (i.e. has ACKed at one of our DAOs since we decided to use it as a parent) */
-  rime_sniffer_add(&orchestra_sniffer);
+  //rime_sniffer_add(&orchestra_sniffer);
   linkaddr_copy(&orchestra_parent_linkaddr, &linkaddr_null);
   /* Initialize all Orchestra rules */
   for(i = 0; i < NUM_RULES; i++) {

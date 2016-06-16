@@ -29,20 +29,26 @@
  */
 /**
  * \file
- *         Orchestra: a slotframe dedicated to unicast data transmission.
- *         If sender-based:
+ *         Orchestra: a slotframe dedicated to unicast data transmission. Designed for
+ *         RPL storing mode only, as this is based on the knowledge of the children (and parent).
+ *         If receiver-based:
  *           Nodes listen at a timeslot defined as hash(MAC) % ORCHESTRA_SB_UNICAST_PERIOD
  *           Nodes transmit at: for each nbr in RPL children and RPL preferred parent,
  *                                             hash(nbr.MAC) % ORCHESTRA_SB_UNICAST_PERIOD
- *         If receiver-based: the opposite
+ *         If sender-based: the opposite
  *
  * \author Simon Duquennoy <simonduq@sics.se>
  */
 
 #include "contiki.h"
-#include "orchestra.h"
+#include "orchestra-node.h"
 #include "net/ipv6/uip-ds6-route.h"
 #include "net/packetbuf.h"
+#include "net/rpl/rpl-conf.h"
+
+#define DEBUG DEBUG_PRINT
+#include "net/ip/uip-debug.h"
+
 
 #if ORCHESTRA_UNICAST_SENDER_BASED && ORCHESTRA_COLLISION_FREE_HASH
 #define UNICAST_SLOT_SHARED_FLAG    ((ORCHESTRA_UNICAST_PERIOD < (ORCHESTRA_MAX_HASH + 1)) ? LINK_OPTION_SHARED : 0)
@@ -85,10 +91,16 @@ add_uc_link(const linkaddr_t *linkaddr)
 {
   if(linkaddr != NULL) {
     uint16_t timeslot = get_node_timeslot(linkaddr);
-    tsch_schedule_add_link(sf_unicast,
-        ORCHESTRA_UNICAST_SENDER_BASED ? LINK_OPTION_RX : LINK_OPTION_TX | UNICAST_SLOT_SHARED_FLAG,
-        LINK_TYPE_NORMAL, &tsch_broadcast_address,
-        timeslot, channel_offset);
+    uint8_t link_options = ORCHESTRA_UNICAST_SENDER_BASED ? LINK_OPTION_RX : LINK_OPTION_TX | UNICAST_SLOT_SHARED_FLAG;
+
+    if(timeslot == get_node_timeslot(&linkaddr_node_addr)) {
+      /* This is also our timeslot, add necessary flags */
+      link_options |= ORCHESTRA_UNICAST_SENDER_BASED ? LINK_OPTION_TX | UNICAST_SLOT_SHARED_FLAG: LINK_OPTION_RX;
+    }
+
+    /* Add/update link */
+    tsch_schedule_add_link(sf_unicast, link_options, LINK_TYPE_NORMAL, &tsch_broadcast_address,
+          timeslot, channel_offset);
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -123,7 +135,17 @@ remove_uc_link(const linkaddr_t *linkaddr)
     }
     item = nbr_table_next(nbr_routes, item);
   }
-  tsch_schedule_remove_link(sf_unicast, l);
+
+  /* Do we need this timeslot? */
+  if(timeslot == get_node_timeslot(&linkaddr_node_addr)) {
+    /* This is our link, keep it but update the link options */
+    uint8_t link_options = ORCHESTRA_UNICAST_SENDER_BASED ? LINK_OPTION_TX | UNICAST_SLOT_SHARED_FLAG: LINK_OPTION_RX;
+    tsch_schedule_add_link(sf_unicast, link_options, LINK_TYPE_NORMAL, &tsch_broadcast_address,
+              timeslot, channel_offset);
+  } else {
+    /* Remove link */
+    tsch_schedule_remove_link(sf_unicast, l);
+  }
 }
 /*---------------------------------------------------------------------------*/
 static void
@@ -143,13 +165,16 @@ select_packet(uint16_t *slotframe, uint16_t *timeslot)
 {
   /* Select data packets we have a unicast link to */
   const linkaddr_t *dest = packetbuf_addr(PACKETBUF_ADDR_RECEIVER);
+  PRINTF("DEST_node1: %u",get_node_timeslot(dest));
   if(packetbuf_attr(PACKETBUF_ATTR_FRAME_TYPE) == FRAME802154_DATAFRAME
      && neighbor_has_uc_link(dest)) {
+    PRINTF("DEST_node2: %u",get_node_timeslot(dest));
     if(slotframe != NULL) {
       *slotframe = slotframe_handle;
     }
     if(timeslot != NULL) {
       *timeslot = ORCHESTRA_UNICAST_SENDER_BASED ? get_node_timeslot(&linkaddr_node_addr) : get_node_timeslot(dest);
+      PRINTF("DEST_node3: %u",*timeslot);
     }
     return 1;
   }
@@ -160,13 +185,14 @@ static void
 new_time_source(const struct tsch_neighbor *old, const struct tsch_neighbor *new)
 {
   if(new != old) {
+    const linkaddr_t *old_addr = old != NULL ? &old->addr : NULL;
     const linkaddr_t *new_addr = new != NULL ? &new->addr : NULL;
     if(new_addr != NULL) {
       linkaddr_copy(&orchestra_parent_linkaddr, new_addr);
     } else {
       linkaddr_copy(&orchestra_parent_linkaddr, &linkaddr_null);
     }
-    remove_uc_link(new_addr);
+    remove_uc_link(old_addr);
     add_uc_link(new_addr);
   }
 }
@@ -185,7 +211,7 @@ init(uint16_t sf_handle)
             timeslot, channel_offset);
 }
 /*---------------------------------------------------------------------------*/
-struct orchestra_rule unicast_per_neighbor = {
+struct orchestra_rule unicast_per_neighbor_rpl_storing = {
   init,
   new_time_source,
   select_packet,

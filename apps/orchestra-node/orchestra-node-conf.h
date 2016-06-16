@@ -46,7 +46,9 @@
  * - a sender-based or receiver-based slotframe for unicast to RPL parents and children
  * - a common shared slotframe for any other traffic (mostly broadcast)
  *  */
-#define ORCHESTRA_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_storing, &default_common }
+
+//#define ORCHESTRA_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_storing, &default_common }
+#define ORCHESTRA_RULES { &unicast_per_neighbor_rpl_storing, &default_common }
 /* Example configuration for RPL non-storing mode: */
 /* #define ORCHESTRA_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_ns, &default_common } */
 
@@ -54,22 +56,24 @@
 
 /* Length of the various slotframes. Tune to balance network capacity,
  * contention, energy, latency. */
+#if 0
 #ifdef ORCHESTRA_CONF_EBSF_PERIOD
 #define ORCHESTRA_EBSF_PERIOD                     ORCHESTRA_CONF_EBSF_PERIOD
 #else /* ORCHESTRA_CONF_EBSF_PERIOD */
 #define ORCHESTRA_EBSF_PERIOD                     397
 #endif /* ORCHESTRA_CONF_EBSF_PERIOD */
+#endif
 
 #ifdef ORCHESTRA_CONF_COMMON_SHARED_PERIOD
 #define ORCHESTRA_COMMON_SHARED_PERIOD            ORCHESTRA_CONF_COMMON_SHARED_PERIOD
 #else /* ORCHESTRA_CONF_COMMON_SHARED_PERIOD */
-#define ORCHESTRA_COMMON_SHARED_PERIOD            31
+#define ORCHESTRA_COMMON_SHARED_PERIOD            7
 #endif /* ORCHESTRA_CONF_COMMON_SHARED_PERIOD */
 
 #ifdef ORCHESTRA_CONF_UNICAST_PERIOD
 #define ORCHESTRA_UNICAST_PERIOD                  ORCHESTRA_CONF_UNICAST_PERIOD
 #else /* ORCHESTRA_CONF_UNICAST_PERIOD */
-#define ORCHESTRA_UNICAST_PERIOD                  17
+#define ORCHESTRA_UNICAST_PERIOD                  7
 #endif /* ORCHESTRA_CONF_UNICAST_PERIOD */
 
 /* Is the per-neighbor unicast slotframe sender-based (if not, it is receiver-based).
@@ -77,9 +81,9 @@
  * routing entries to keep track of children and parents. */
 #ifdef ORCHESTRA_CONF_UNICAST_SENDER_BASED
 #define ORCHESTRA_UNICAST_SENDER_BASED            ORCHESTRA_CONF_UNICAST_SENDER_BASED
-#else /* ORCHESTRA_CONF_UNICAST_SENDER_BASED */
-#define ORCHESTRA_UNICAST_SENDER_BASED            0
-#endif /* ORCHESTRA_CONF_UNICAST_SENDER_BASED */
+#else // /* ORCHESTRA_CONF_UNICAST_SENDER_BASED */
+#define ORCHESTRA_UNICAST_SENDER_BASED            1
+#endif // /* ORCHESTRA_CONF_UNICAST_SENDER_BASED */
 
 /* The hash function used to assign timeslot to a given node (based on its link-layer address) */
 #ifdef ORCHESTRA_CONF_LINKADDR_HASH

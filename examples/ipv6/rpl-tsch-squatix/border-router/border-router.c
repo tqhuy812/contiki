@@ -9,7 +9,7 @@
 #include "net/mac/tsch/tsch-schedule.h"
 #include "net/netstack.h"
 #include "dev/slip.h"
-#include "button-sensor.h"
+//#include "button-sensor.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,8 +23,17 @@
 #include "squatix-br.h"
 #endif /* WITH_SQUATIX */
 
+#if WITH_ORCHESTRA
+#include "orchestra-br.h"
+#endif /* WITH_ORCHESTRA */
+
 static uip_ipaddr_t prefix;
 static uint8_t prefix_set;
+
+// static struct tsch_link *link;
+static struct tsch_slotframe *sf;
+
+
 
 PROCESS(border_router_process, "Border router process");
 
@@ -33,22 +42,22 @@ PROCESS(border_router_process, "Border router process");
 //Skip simple web process, go straight to border router
 AUTOSTART_PROCESSES(&border_router_process);
 /*---------------------------------------------------------------------------*/
-static void
-print_local_addresses(void)
-{
-  int i;
-  uint8_t state;
-  PRINTA("Server IPv6 addresses:\n");
-  for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
-    state = uip_ds6_if.addr_list[i].state;
-    if(uip_ds6_if.addr_list[i].isused &&
-       (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
-      PRINTA(" ");
-      uip_debug_ipaddr_print(&uip_ds6_if.addr_list[i].ipaddr);
-      PRINTA("\n");
-    }
-  }
-}
+// static void
+// print_local_addresses(void)
+// {
+//   int i;
+//   uint8_t state;
+//   PRINTA("Server IPv6 addresses:\n");
+//   for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
+//     state = uip_ds6_if.addr_list[i].state;
+//     if(uip_ds6_if.addr_list[i].isused &&
+//        (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
+//       PRINTA(" ");
+//       uip_debug_ipaddr_print(&uip_ds6_if.addr_list[i].ipaddr);
+//       PRINTA("\n");
+//     }
+//   }
+// }
 /*---------------------------------------------------------------------------*/
 void
 request_prefix(void)
@@ -167,7 +176,7 @@ PROCESS_THREAD(border_router_process, ev, data)
   
   PROCESS_PAUSE();
 
-  SENSORS_ACTIVATE(button_sensor);
+  //SENSORS_ACTIVATE(button_sensor);
 
   PRINTF("RPL-Border router started\n");
 #if 0
@@ -194,21 +203,41 @@ PROCESS_THREAD(border_router_process, ev, data)
 //Newly added
 net_init(&prefix);
 
-#if DEBUG || 1
-  print_local_addresses();
-#endif
+// #if DEBUG || 1
+//   print_local_addresses();
+// #endif
+
+//Add TSCH schedule here
+
+  etimer_set(&et, CLOCK_SECOND * 10); //Change to *30 to observe the Routing Table more frequently
+
+
+  while(1) {
+  print_network_status();
+//  tsch_schedule_init();
 
   #if WITH_SQUATIX
   squatix_init();
 #endif /* WITH_SQUATIX */
 
-  etimer_set(&et, CLOCK_SECOND * 20); //Change to *30 to observe the Routing Table more frequently
+  #if WITH_ORCHESTRA
+  orchestra_init();
+#endif /* WITH_ORCHESTRA */
 
-  while(1) {
-  print_network_status();
-//  tsch_schedule_init();
+  // sf = tsch_schedule_get_slotframe_by_handle(1);
+
+    
+
+  // PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
+
   PROCESS_YIELD_UNTIL(etimer_expired(&et));
+// tsch_schedule_remove_slotframe(sf);
     etimer_reset(&et);
+// etimer_set(&et, CLOCK_SECOND * 20);
+    // PROCESS_YIELD_UNTIL(etimer_expired(&et));
+// // tsch_schedule_remove_slotframe(sf);
+    // etimer_reset(&et);
+  
   //   PROCESS_YIELD();
   //   if (ev == sensors_event && data == &button_sensor) {
   //     PRINTF("Initiating global repair\n");

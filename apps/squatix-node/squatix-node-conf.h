@@ -1,11 +1,38 @@
 /*
  * Copyright (c) 2015, Swedish Institute of Computer Science.
  * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the Institute nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
  */
 
 /**
  * \file
- *         SQUATIX configuration
+ *         Orchestra configuration
+ *
+ * \author Simon Duquennoy <simonduq@sics.se>
  */
 
 #ifndef __SQUATIX_CONF_H__
@@ -20,57 +47,46 @@
  * - a common shared slotframe for any other traffic (mostly broadcast)
  *  */
 
-#define SQUATIX_RULES {&one_slotframe, &data_slotframe}
-//#define SQUATIX_RULES {&general_slotframe}
-//#define SQUATIX_RULES {&one_slotframe}
+//#define SQUATIX_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_storing, &default_common }
+// #define SQUATIX_RULES { &default_common, &unicast_per_neighbor_rpl_storing}
+#define SQUATIX_RULES { &unicast_per_neighbor_rpl_storing, &default_common}
+
+/* Example configuration for RPL non-storing mode: */
+/* #define SQUATIX_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_ns, &default_common } */
+
 #endif /* SQUATIX_CONF_RULES */
-
-
-///////// Using only one Slotframe, no need to declare several slotframes//////
 
 /* Length of the various slotframes. Tune to balance network capacity,
  * contention, energy, latency. */
+#if 0
+#ifdef SQUATIX_CONF_EBSF_PERIOD
+#define SQUATIX_EBSF_PERIOD                     SQUATIX_CONF_EBSF_PERIOD
+#else /* SQUATIX_CONF_EBSF_PERIOD */
+#define SQUATIX_EBSF_PERIOD                     397
+#endif /* SQUATIX_CONF_EBSF_PERIOD */
+#endif
 
-/* Only use one slotframe, comment other slotframes structure*/
-#ifdef SQUATIX_CONF_ONE_SLOTFRAME_PERIOD
-#define SQUATIX_ONE_SLOTFRAME_PERIOD                  SQUATIX_CONF_ONE_SLOTFRAME_PERIOD
-#else /* SQUATIX_CONF_ONE_SLOTFRAME_PERIOD */
-#define SQUATIX_ONE_SLOTFRAME_PERIOD                  7
-#endif /* SQUATIX_ONE_SLOTFRAME_PERIOD */
+#ifdef SQUATIX_CONF_COMMON_SHARED_PERIOD
+#define SQUATIX_COMMON_SHARED_PERIOD            SQUATIX_CONF_COMMON_SHARED_PERIOD
+#else /* SQUATIX_CONF_COMMON_SHARED_PERIOD */
+#define SQUATIX_COMMON_SHARED_PERIOD            7
+#endif /* SQUATIX_CONF_COMMON_SHARED_PERIOD */
 
-#ifdef SQUATIX_CONF_DATA_SLOTFRAME_PERIOD
-#define SQUATIX_DATA_SLOTFRAME_PERIOD                  SQUATIX_CONF_DATA_SLOTFRAME_PERIOD
-#else /* SQUATIX_CONF_DATA_SLOTFRAME_PERIOD */
-#define SQUATIX_DATA_SLOTFRAME_PERIOD                  7
-#endif /* SQUATIX_DATA_SLOTFRAME_PERIOD */
-
-#ifdef SQUATIX_CONF_GENERAL_SLOTFRAME_PERIOD
-#define SQUATIX_GENERAL_SLOTFRAME_PERIOD                  SQUATIX_CONF_GENERAL_SLOTFRAME_PERIOD
-#else /* SQUATIX_CONF_GENERAL_SLOTFRAME_PERIOD */
-#define SQUATIX_GENERAL_SLOTFRAME_PERIOD                  7
-#endif /* SQUATIX_GENERAL_SLOTFRAME_PERIOD */
+#ifdef SQUATIX_CONF_UNICAST_PERIOD
+#define SQUATIX_UNICAST_PERIOD                  SQUATIX_CONF_UNICAST_PERIOD
+#else /* SQUATIX_CONF_UNICAST_PERIOD */
+#define SQUATIX_UNICAST_PERIOD                  7
+#endif /* SQUATIX_CONF_UNICAST_PERIOD */
 
 /* Is the per-neighbor unicast slotframe sender-based (if not, it is receiver-based).
  * Note: sender-based works only with RPL storing mode as it relies on DAO and
  * routing entries to keep track of children and parents. */
+#ifdef SQUATIX_CONF_UNICAST_SENDER_BASED
+#define SQUATIX_UNICAST_SENDER_BASED            SQUATIX_CONF_UNICAST_SENDER_BASED
+#else // /* SQUATIX_CONF_UNICAST_SENDER_BASED */
+#define SQUATIX_UNICAST_SENDER_BASED            1
+#endif // /* SQUATIX_CONF_UNICAST_SENDER_BASED */
 
-#ifdef SQUATIX_CONF_DATA_SENDER_BASED
-#define SQUATIX_DATA_SENDER_BASED            SQUATIX_CONF_DATA_SENDER_BASED
-#else /* SQUATIX_CONF_DATA_SENDER_BASED */
-#define SQUATIX_DATA_SENDER_BASED            1
-#endif /* SQUATIX_CONF_DATA_SENDER_BASED */
-
-#if 0
-#ifdef SQUATIX_CONF_GENERAL_SENDER_BASED
-#define SQUATIX_GENERAL_SENDER_BASED            SQUATIX_CONF_GENERAL_SENDER_BASED
-#else /* SQUATIX_CONF_GENERAL_SENDER_BASED */
-#define SQUATIX_GENERAL_SENDER_BASED            0
-#endif /* SQUATIX_CONF_GENERAL_SENDER_BASED */
-#endif
-///////// End of Using only one Slotframe, no need to declare several slotframes//////
-
-
-// Comment the hash function use to assign cell to node ID//
 /* The hash function used to assign timeslot to a given node (based on its link-layer address) */
 #ifdef SQUATIX_CONF_LINKADDR_HASH
 #define SQUATIX_LINKADDR_HASH                   SQUATIX_CONF_LINKADDR_HASH
@@ -91,7 +107,5 @@
 #else /* SQUATIX_CONF_COLLISION_FREE_HASH */
 #define SQUATIX_COLLISION_FREE_HASH             0 /* Set to 1 if SQUATIX_LINKADDR_HASH returns unique hashes */
 #endif /* SQUATIX_CONF_COLLISION_FREE_HASH */
-
-// End of Comment the hash function use to assign cell to node ID//
 
 #endif /* __SQUATIX_CONF_H__ */

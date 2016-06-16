@@ -36,17 +36,19 @@
  */
 
 #include "contiki.h"
-#include "orchestra.h"
+#include "squatix-node.h"
+ #define DEBUG DEBUG_PRINT
+#include "net/ip/uip-debug.h"
 
 static uint16_t slotframe_handle = 0;
 static uint16_t channel_offset = 0;
 
-#if ORCHESTRA_EBSF_PERIOD > 0
+#if SQUATIX_EBSF_PERIOD > 0
 /* There is a slotframe for EBs, use this slotframe for non-EB traffic only */
-#define ORCHESTRA_COMMON_SHARED_TYPE              LINK_TYPE_NORMAL
+#define SQUATIX_COMMON_SHARED_TYPE              LINK_TYPE_NORMAL
 #else
 /* There is no slotframe for EBs, use this slotframe both EB and non-EB traffic */
-#define ORCHESTRA_COMMON_SHARED_TYPE              LINK_TYPE_ADVERTISING
+#define SQUATIX_COMMON_SHARED_TYPE              LINK_TYPE_ADVERTISING_ONLY
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -70,14 +72,14 @@ init(uint16_t sf_handle)
   channel_offset = slotframe_handle;
   /* Default slotframe: for broadcast or unicast to neighbors we
    * do not have a link to */
-  struct tsch_slotframe *sf_common = tsch_schedule_add_slotframe(slotframe_handle, ORCHESTRA_COMMON_SHARED_PERIOD);
+  struct tsch_slotframe *sf_common = tsch_schedule_add_slotframe(slotframe_handle, SQUATIX_COMMON_SHARED_PERIOD);
   tsch_schedule_add_link(sf_common,
       LINK_OPTION_RX | LINK_OPTION_TX | LINK_OPTION_SHARED,
-      ORCHESTRA_COMMON_SHARED_TYPE, &tsch_broadcast_address,
+      SQUATIX_COMMON_SHARED_TYPE, &tsch_broadcast_address,
       0, channel_offset);
 }
 /*---------------------------------------------------------------------------*/
-struct orchestra_rule default_common = {
+struct squatix_rule default_common = {
   init,
   NULL,
   select_packet,

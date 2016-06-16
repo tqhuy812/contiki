@@ -14,7 +14,9 @@
 // End of Adding this library to edit the number of maximum routes in a node
 
 ///////Adding this file to test add_link function//////
+#if WITH_SQUATIX
 #include "squatix-node.h"
+#endif
 ///////End of Adding this file to test add_link function//////
 
 #include "net/rpl/rpl.h"
@@ -35,7 +37,7 @@
 ///////////////////////////////////////////////
 
 #if WITH_ORCHESTRA
-#include "orchestra.h"
+#include "orchestra-node.h"
 #endif /* WITH_ORCHESTRA */
 
 
@@ -230,18 +232,21 @@ PROCESS_THREAD(node_process, ev, data)
   // End of activate resources
 ///////////////////////////////////////////////////////////
 
-#if WITH_SQUATIX
-  squatix_init();
-#endif /* WITH_SQUATIX */
-
-// #if WITH_ORCHESTRA
-//   orchestra_init();
-// #endif /* WITH_ORCHESTRA */
+//Add TSCH schedule here
 
   /* Print out routing tables every minute */
   etimer_set(&et, CLOCK_SECOND * 60);
   while(1) {
     print_network_status();
+
+    #if WITH_SQUATIX
+  squatix_init();
+#endif /* WITH_SQUATIX */
+
+#if WITH_ORCHESTRA
+  orchestra_init();
+#endif /* WITH_ORCHESTRA */
+  
 ///////////////////////////////////////////
 // if(ev == sensors_event) {
 //       PRINTF("*******BUTTON*******\n");

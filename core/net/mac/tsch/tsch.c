@@ -950,12 +950,11 @@ packet_input(void)
   int frame_parsed = 1;
 
   frame_parsed = NETSTACK_FRAMER.parse();
-
   if(frame_parsed < 0) {
     PRINTF("TSCH:! failed to parse %u\n", packetbuf_datalen());
   } else {
     int duplicate = 0;
-
+    
     /* Seqno of 0xffff means no seqno */
     if(packetbuf_attr(PACKETBUF_ATTR_MAC_SEQNO) != 0xffff) {
       /* Check for duplicate packet by comparing the sequence number

@@ -23,6 +23,24 @@
   
 #endif /* WITH_SQUATIX */
 
+/* Set to run Orchestra */
+#ifndef WITH_ORCHESTRA
+#define WITH_ORCHESTRA 0
+#endif /* WITH_ORCHESTRA */
+
+#if WITH_ORCHESTRA
+
+/* See apps/orchestra/README.md for more Orchestra configuration options */
+#define TSCH_SCHEDULE_CONF_WITH_6TISCH_MINIMAL 0 /* No 6TiSCH minimal schedule */
+#define TSCH_CONF_WITH_LINK_SELECTOR 1 /* Orchestra requires per-packet link selection */
+/* Orchestra callbacks */
+#define TSCH_CALLBACK_NEW_TIME_SOURCE orchestra_callback_new_time_source
+#define TSCH_CALLBACK_PACKET_READY orchestra_callback_packet_ready
+#define NETSTACK_CONF_ROUTING_NEIGHBOR_ADDED_CALLBACK orchestra_callback_child_added
+#define NETSTACK_CONF_ROUTING_NEIGHBOR_REMOVED_CALLBACK orchestra_callback_child_removed
+  
+#endif /* WITH_ORCHESTRA */
+
 #ifndef UIP_FALLBACK_INTERFACE
 #define UIP_FALLBACK_INTERFACE rpl_interface
 #endif
@@ -62,7 +80,7 @@
 
 
 #ifndef UIP_CONF_BUFFER_SIZE
-#define UIP_CONF_BUFFER_SIZE    240 //140
+#define UIP_CONF_BUFFER_SIZE    140
 #endif
 
 #ifndef UIP_CONF_RECEIVE_WINDOW
@@ -115,7 +133,7 @@
 // /* TSCH logging. 0: disabled. 1: basic log. 2: with delayed
 //  * log messages from interrupt */
 #undef TSCH_LOG_CONF_LEVEL
-#define TSCH_LOG_CONF_LEVEL 0
+#define TSCH_LOG_CONF_LEVEL 2
 
 /* IEEE802.15.4 PANID */
 #undef IEEE802154_CONF_PANID
@@ -125,9 +143,9 @@
 #undef TSCH_CONF_AUTOSTART
 #define TSCH_CONF_AUTOSTART 0
 
-// /* RPL storing mode */
-// #undef RPL_CONF_MOP
-// #define RPL_CONF_MOP RPL_MOP_NON_STORING
+/* RPL storing mode */
+#undef RPL_CONF_MOP
+#define RPL_CONF_MOP RPL_MOP_STORING_NO_MULTICAST
 
 /* 6TiSCH minimal schedule length.
 / * Larger values result in less frequent active slots: reduces capacity and saves energy. */

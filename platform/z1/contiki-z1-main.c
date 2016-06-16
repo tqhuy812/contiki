@@ -152,7 +152,7 @@ set_rime_addr(void)
     addr.u8[1] = node_id >> 8;
   }
 #endif
-  linkaddr_set_node_addr(&addr);
+  linkaddr_set_node_addr(&addr);  
   printf("Rime started with address ");
   for(i = 0; i < sizeof(addr.u8) - 1; i++) {
     printf("%d.", addr.u8[i]);

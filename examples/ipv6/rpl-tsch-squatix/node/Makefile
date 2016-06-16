@@ -40,7 +40,7 @@ SMALL=1
 
 
 APPS += squatix-node
-APPS += orchestra
+#APPS += orchestra-node
 MODULES += core/net/mac/tsch
 
 
