@@ -69,21 +69,21 @@ get_node_timeslot(const linkaddr_t *addr)
   }
 }
 /*---------------------------------------------------------------------------*/
-// static int
-// neighbor_has_uc_link(const linkaddr_t *linkaddr)
-// {
-//   if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
-//     // if((squatix_parent_knows_us || !SQUATIX_UNICAST_SENDER_BASED)
-//     //    && linkaddr_cmp(&squatix_parent_linkaddr, linkaddr)) {
-//     //   return 1;
-//     // }
-//     // if(nbr_table_get_from_lladdr(nbr_routes, (linkaddr_t *)linkaddr) != NULL) {
-//     //   return 1;
-//     // }
-//     return 1;
-//   }
-//   return 0;
-// }
+static int
+neighbor_has_uc_link(const linkaddr_t *linkaddr)
+{
+  if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
+    // if((squatix_parent_knows_us || !SQUATIX_UNICAST_SENDER_BASED)
+    //    && linkaddr_cmp(&squatix_parent_linkaddr, linkaddr)) {
+    //   return 1;
+    // }
+    // if(nbr_table_get_from_lladdr(nbr_routes, (linkaddr_t *)linkaddr) != NULL) {
+    //   return 1;
+    // }
+    return 1;
+  }
+  return 0;
+}
 /*---------------------------------------------------------------------------*/
 static void
 add_uc_link(const linkaddr_t *linkaddr)
@@ -156,7 +156,7 @@ static int
 select_packet(uint16_t *slotframe, uint16_t *timeslot)
 {
   /* Select data packets we have a unicast link to */
-  // const linkaddr_t *dest = packetbuf_addr(PACKETBUF_ADDR_RECEIVER);
+  const linkaddr_t *dest = packetbuf_addr(PACKETBUF_ADDR_RECEIVER);
   if(packetbuf_attr(PACKETBUF_ATTR_FRAME_TYPE) == FRAME802154_DATAFRAME){
      // && neighbor_has_uc_link(dest)) {
     //PRINTF("BBBBBBBBBBBBBBBBB");
