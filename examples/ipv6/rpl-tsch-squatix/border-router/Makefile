@@ -10,7 +10,7 @@ CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
 PROJECT_SOURCEFILES += slip-bridge.c
 MODULES += core/net/mac/tsch
 APPS += squatix-br
-#APPS += orchestra-br
+# APPS += orchestra-br
 #Simple built-in webserver is the default.
 #Override with make WITH_WEBSERVER=0 for no webserver.
 #WITH_WEBSERVER=webserver-name will use /apps/webserver-name if it can be

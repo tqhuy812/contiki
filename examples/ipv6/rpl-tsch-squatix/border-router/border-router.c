@@ -32,7 +32,8 @@ static uip_ipaddr_t prefix;
 static uint8_t prefix_set;
 
 // static struct tsch_link *link;
-static struct tsch_slotframe *sf;
+// static struct tsch_slotframe *sf;
+// static struct tsch_slotframe *sf_unicast;
 
 
 
@@ -209,11 +210,6 @@ net_init(&prefix);
 // #endif
 
 //Add TSCH schedule here
-
-  while(1) {
-  print_network_status();
-//  tsch_schedule_init();
-
   #if WITH_SQUATIX
   squatix_init();
 #endif /* WITH_SQUATIX */
@@ -221,25 +217,50 @@ net_init(&prefix);
   #if WITH_ORCHESTRA
   orchestra_init();
 #endif /* WITH_ORCHESTRA */
-PRINTF("BR_TEST1");
-  etimer_set(&et, CLOCK_SECOND * 10); //Change to *30 to observe the Routing Table more frequently
 
+  etimer_set(&et, CLOCK_SECOND * 20); //Change to *30 to observe the Routing Table more frequently
 
+  while(1) {
+  print_network_status();
+//  tsch_schedule_init();
 
   // sf = tsch_schedule_get_slotframe_by_handle(1);
-
-    
 
   // PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
 
   PROCESS_YIELD_UNTIL(etimer_expired(&et));
-// tsch_schedule_remove_slotframe(sf);
+  // tsch_schedule_remove_link_by_timeslot(sf,0);
+  // if(tsch_schedule_get_slotframe_by_handle(1)==NULL)
+  //   PRINTF("BR_TEST3");
+  
+  // tsch_schedule_print();
+
+
+  // Change the other timeslots from LINK_TYPE_NORMAL to LINK_TYPE_ADVERTISING
+  // to receive EB packets
+  // sf = tsch_schedule_get_slotframe_by_handle(0);
+  // link = list_head(sf->links_list);
+  // while(link!=NULL){
+  //   link->link_type=1;
+  //   link = list_item_next(link);
+  // }
+
+  // PRINTF("BR_TEST1");
+  // tsch_schedule_print();
+  // PRINTF("BR_TEST2");
+
     etimer_reset(&et);
+
+
 // etimer_set(&et, CLOCK_SECOND * 20);
     // PROCESS_YIELD_UNTIL(etimer_expired(&et));
 // // tsch_schedule_remove_slotframe(sf);
     // etimer_reset(&et);
   
+
+
+
+
   //   PROCESS_YIELD();
   //   if (ev == sensors_event && data == &button_sensor) {
   //     PRINTF("Initiating global repair\n");

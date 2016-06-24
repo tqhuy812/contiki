@@ -44,6 +44,9 @@
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
+// static struct tsch_link *link;
+// static struct tsch_slotframe *sf;
+
 //#define CONFIG_VIA_BUTTON PLATFORM_HAS_BUTTON
 //#if CONFIG_VIA_BUTTON
 //#include "button-sensor.h"
@@ -133,7 +136,7 @@ print_network_status(void)
       PRINTA("\n");
     }
   }
-  
+  /*---------------------------------------------------------------------------*/
   /* Our default route */
   PRINTA("- Default route:\n");
   default_route = uip_ds6_defrt_lookup(uip_ds6_defrt_choose());
@@ -233,12 +236,6 @@ PROCESS_THREAD(node_process, ev, data)
 ///////////////////////////////////////////////////////////
 
 //Add TSCH schedule here
-
-  /* Print out routing tables every minute */
-  etimer_set(&et, CLOCK_SECOND * 60);
-  while(1) {
-    print_network_status();
-
     #if WITH_SQUATIX
   squatix_init();
 #endif /* WITH_SQUATIX */
@@ -246,7 +243,14 @@ PROCESS_THREAD(node_process, ev, data)
 #if WITH_ORCHESTRA
   orchestra_init();
 #endif /* WITH_ORCHESTRA */
-  PRINTF("NODE_TEST1");
+  // PRINTF("NODE_TEST1");
+  /* Print out routing tables every minute */
+  etimer_set(&et, CLOCK_SECOND * 30);
+  while(1) {
+    print_network_status();
+
+
+  
 ///////////////////////////////////////////
 // if(ev == sensors_event) {
 //       PRINTF("*******BUTTON*******\n");
@@ -258,8 +262,24 @@ PROCESS_THREAD(node_process, ev, data)
 //       res_separate.resume();
 //     }
 //////////////////////////////////////
-
+    // sf = tsch_schedule_get_slotframe_by_handle(1);
+  
     PROCESS_YIELD_UNTIL(etimer_expired(&et));
+    // tsch_schedule_remove_slotframe(sf);
+    // printf("NODE_TEST3");
+    // tsch_schedule_print();
+
+    // sf = tsch_schedule_get_slotframe_by_handle(0);
+    // link = list_head(sf->links_list);
+    // while(link!=NULL){
+    //   link->link_type=1;
+    //   link = list_item_next(link);
+    // }
+
+  // printf("NODE_TEST1");
+  // tsch_schedule_print();
+  // printf("NODE_TEST2");
+
     etimer_reset(&et);
   }
   
