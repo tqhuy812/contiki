@@ -17,15 +17,15 @@ static uint16_t channel_offset = 0;
 #endif
 
 /*---------------------------------------------------------------------------*/
-static uint16_t
-get_node_timeslot(const linkaddr_t *addr)
-{
-  if(addr != NULL && SQUATIX_UNICAST_PERIOD > 0) {
-    return SQUATIX_LINKADDR_HASH(addr) % SQUATIX_UNICAST_PERIOD;
-  } else {
-    return 0xffff;
-  }
-}
+// static uint16_t
+// get_node_timeslot(const linkaddr_t *addr)
+// {
+//   if(addr != NULL && SQUATIX_UNICAST_PERIOD > 0) {
+//     return SQUATIX_LINKADDR_HASH(addr) % SQUATIX_UNICAST_PERIOD;
+//   } else {
+//     return 0xffff;
+//   }
+// }
 /*---------------------------------------------------------------------------*/
 static int
 select_packet(uint16_t *slotframe, uint16_t *timeslot)

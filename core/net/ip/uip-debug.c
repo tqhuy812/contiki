@@ -69,18 +69,25 @@ uip_debug_ipaddr_print(const uip_ipaddr_t *addr)
      *
      * [1] https://tools.ietf.org/html/rfc3513#page-5
      */
+
     PRINTA("::FFFF:%u.%u.%u.%u", addr->u8[12], addr->u8[13], addr->u8[14], addr->u8[15]);
   } else {
     for(i = 0, f = 0; i < sizeof(uip_ipaddr_t); i += 2) {
       a = (addr->u8[i] << 8) + addr->u8[i + 1];
       if(a == 0 && f >= 0) {
         if(f++ == 0) {
+          // PRINTA("AAAAAAAAAA");
           PRINTA("::");
         }
-      } else {
+      } 
+      else {
+        // PRINTA("BBBBBBB");
         if(f > 0) {
+          // PRINTF("CCCCCC");
           f = -1;
-        } else if(i > 0) {
+        } 
+        else if(i > 0) {
+          // PRINTA("DDDDDDDD");
           PRINTA(":");
         }
         PRINTA("%x", a);

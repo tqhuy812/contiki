@@ -147,6 +147,8 @@ rpl_purge_routes(void)
       PRINT6ADDR(&prefix);
       dag = default_instance->current_dag;
       /* Propagate this information with a No-Path DAO to preferred parent if we are not a RPL Root */
+      // PRINTF("RPLLLLLLLLLL: %u ",dag->rank);
+      // PRINTF("RPLLLLLLLLLL: %u ",ROOT_RANK(default_instance));
       if(dag->rank != ROOT_RANK(default_instance)) {
         PRINTF(" -> generate No-Path DAO\n");
         dao_output_target(dag->preferred_parent, &prefix, RPL_ZERO_LIFETIME);

@@ -10,7 +10,7 @@
 #include "net/ipv6/uip-ds6-route.h"
 
 // Adding this library to edit the number of maximum routes in a node
-#include "net/ipv6/uip-ds6.h"
+// #include "net/ipv6/uip-ds6.h"
 // End of Adding this library to edit the number of maximum routes in a node
 
 ///////Adding this file to test add_link function//////
@@ -30,22 +30,29 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 ////////////////////////////////////////////////
 #include "contiki.h"
 #include "contiki-net.h"
-//#include "rest-engine.h"
+#include "rest-engine.h"
 ///////////////////////////////////////////////
 
-#if WITH_ORCHESTRA
-#include "orchestra-node.h"
-#endif /* WITH_ORCHESTRA */
+// #if WITH_ORCHESTRA
+// #include "orchestra-node.h"
+// #endif /* WITH_ORCHESTRA */
 
 
+// #define DEBUG DEBUG_NONE
 #define DEBUG DEBUG_PRINT
+
 #include "net/ip/uip-debug.h"
 
-// static struct tsch_link *link;
-// static struct tsch_slotframe *sf;
+#include "net/ip/ip64-addr.h"     // include to call function ip64_addr_is_ipv4_mapped_addr(addr)
+
+
+
+// static char full_ipaddr[256];
+
 
 //#define CONFIG_VIA_BUTTON PLATFORM_HAS_BUTTON
 //#if CONFIG_VIA_BUTTON
@@ -63,7 +70,7 @@
  * The build system automatically compiles the resources in the corresponding sub-directory.
  */
 // extern resource_t
-//   res_hello,
+  // res_hello,
 //   res_mirror,
 //   res_chunks,
 //   res_separate,
@@ -108,59 +115,130 @@ extern resource_t res_sht11;
 
 /*---------------------------------------------------------------------------*/
 PROCESS(node_process, "RPL Node");
-// #if CONFIG_VIA_BUTTON
-// AUTOSTART_PROCESSES(&node_process, &sensors_process);
-// #else /* CONFIG_VIA_BUTTON */
 AUTOSTART_PROCESSES(&node_process);
-//#endif /* CONFIG_VIA_BUTTON */
 
-/*---------------------------------------------------------------------------*/
-static void
-print_network_status(void)
+/*-----Return ipaddr of the parent node (default router) of a node-----*/ //====OK====
+static uip_ipaddr_t *get_default_router_ipaddr(void)
 {
-  int i;
-  uint8_t state;
+  uip_ipaddr_t *parent_node_ipaddr;
   uip_ds6_defrt_t *default_route;
-  uip_ds6_route_t *route;
 
-  PRINTA("--- Network status ---\n");
-  
-  /* Our IPv6 addresses */
-  PRINTA("- Server IPv6 addresses:\n");
-  for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
-    state = uip_ds6_if.addr_list[i].state;
-    if(uip_ds6_if.addr_list[i].isused &&
-       (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
-      PRINTA("-- ");
-      uip_debug_ipaddr_print(&uip_ds6_if.addr_list[i].ipaddr);
-      PRINTA("\n");
-    }
-  }
-  /*---------------------------------------------------------------------------*/
-  /* Our default route */
-  PRINTA("- Default route:\n");
   default_route = uip_ds6_defrt_lookup(uip_ds6_defrt_choose());
   if(default_route != NULL) {
-    PRINTA("-- ");
-    uip_debug_ipaddr_print(&default_route->ipaddr);;
-    PRINTA(" (lifetime: %lu seconds)\n", (unsigned long)default_route->lifetime.interval);
-  } else {
-    PRINTA("-- None\n");
+    parent_node_ipaddr = &default_route->ipaddr;
+    return parent_node_ipaddr;
   }
+  else return NULL;
+}
+/*---------------------------------------------------------------------------*/
+// static void
+// print_network_status(void)
+// {
+//   int i;
+//   uint8_t state;
+//   uip_ds6_defrt_t *default_route;
+//   uip_ds6_route_t *route;
 
-  /* Our routing entries */
-  PRINTA("- Routing entries (%u in total):\n", uip_ds6_route_num_routes());
-  route = uip_ds6_route_head();
-  while(route != NULL) {
-    PRINTA("-- ");
-    uip_debug_ipaddr_print(&route->ipaddr);
-    PRINTA(" via ");
-    uip_debug_ipaddr_print(uip_ds6_route_nexthop(route));
-    PRINTA(" (lifetime: %lu seconds)\n", (unsigned long)route->state.lifetime);
-    route = uip_ds6_route_next(route); 
-  }
+//   PRINTA("--- Network status ---\n");
   
-  PRINTA("----------------------\n");
+//   /* Our IPv6 addresses */
+//   PRINTA("- Server IPv6 addresses:\n");
+//   for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
+//     state = uip_ds6_if.addr_list[i].state;
+//     if(uip_ds6_if.addr_list[i].isused &&
+//        (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
+//       PRINTA("-- ");
+//       uip_debug_ipaddr_print(&uip_ds6_if.addr_list[i].ipaddr);
+//       PRINTA("\n");
+//     }
+//   }
+  /*---------------------------------------------------------------------------*/
+  /* Our default route */
+//   PRINTA("- Default route:\n");
+//   default_route = uip_ds6_defrt_lookup(uip_ds6_defrt_choose());
+//   if(default_route != NULL) {
+//     PRINTA("-- ");
+//     uip_debug_ipaddr_print(&default_route->ipaddr);;
+//     PRINTA(" (lifetime: %lu seconds)\n", (unsigned long)default_route->lifetime.interval);
+//   } else {
+//     PRINTA("-- None\n");
+//   }
+
+//   /* Our routing entries */
+//   PRINTA("- Routing entries (%u in total):\n", uip_ds6_route_num_routes());
+//   route = uip_ds6_route_head();
+//   while(route != NULL) {
+//     PRINTA("-- ");
+//     uip_debug_ipaddr_print(&route->ipaddr);
+//     PRINTA(" via ");
+//     uip_debug_ipaddr_print(uip_ds6_route_nexthop(route));
+//     PRINTA(" (lifetime: %lu seconds)\n", (unsigned long)route->state.lifetime);
+//     route = uip_ds6_route_next(route); 
+//   }
+  
+//   PRINTA("----------------------\n");
+// }
+/*---------------------------------------------------------------------------*/
+static 
+char*
+uip_ipaddr_printf(const uip_ipaddr_t *addr)
+{
+#if NETSTACK_CONF_WITH_IPV6
+  uint16_t a;
+  unsigned int i;
+  int f;
+  char full_ipaddr[512];
+  memset(full_ipaddr,0,sizeof(full_ipaddr));
+  char temp[256];
+  // memset(temp,0,sizeof(temp));
+
+#endif /* NETSTACK_CONF_WITH_IPV6 */
+
+  if(addr == NULL) {
+    // PRINTA("(NULL IP addr)");
+    // strcpy(temp,full_ipaddr);
+    sprintf(full_ipaddr, "NULL IP addr");
+    return full_ipaddr;
+  }
+#if NETSTACK_CONF_WITH_IPV6
+
+  if(ip64_addr_is_ipv4_mapped_addr(addr)) {
+    // PRINTA("::FFFF:%u.%u.%u.%u", addr->u8[12], addr->u8[13], addr->u8[14], addr->u8[15]);
+    sprintf(full_ipaddr,"::FFFF:%u.%u.%u.%u", addr->u8[12], addr->u8[13], addr->u8[14], addr->u8[15]);
+  } /* END OF (ip64_addr_is_ipv4_mapped_addr(addr)) */
+
+  else {
+    for(i = 0, f = 0; i < sizeof(uip_ipaddr_t); i += 2) {
+      a = (addr->u8[i] << 8) + addr->u8[i + 1];
+      if(a == 0 && f >= 0) {
+        if(f++ == 0) {
+          //PRINTA("::");
+          strcpy(temp,full_ipaddr);
+          sprintf(full_ipaddr,"%s::",temp);
+        } /* END OF (f++ == 0) */
+      } /* END OF (a == 0 && f >= 0) */
+      else {
+        
+          if(f > 0) {
+            f = -1;
+          } 
+          else 
+            if(i > 0) {
+              // PRINTA(":");
+              strcpy(temp,full_ipaddr);
+              sprintf(full_ipaddr,"%s:",temp);
+            }
+              strcpy(temp,full_ipaddr);
+              sprintf(full_ipaddr,"%s%x",temp,a);
+        } /* END OF else */
+
+    }
+  }
+return full_ipaddr;
+#else /* NETSTACK_CONF_WITH_IPV6 */
+  // PRINTA("%u.%u.%u.%u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+  sprintf(full_ipaddr,"%u.%u.%u.%u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+#endif /* NETSTACK_CONF_WITH_IPV6 */
 }
 /*---------------------------------------------------------------------------*/
 static void
@@ -184,11 +262,13 @@ net_init(uip_ipaddr_t *br_prefix)
 PROCESS_THREAD(node_process, ev, data)
 {
   static struct etimer et;
+  // static char *temp_string;
   PROCESS_BEGIN();
-  
+
   static int is_coordinator = 0;
   static enum { role_6ln, role_6dr, role_6dr_sec } node_role;
   
+
   node_role = role_6ln;
   
   /* Set node with ID == 1 as coordinator, convenient in Cooja. */
@@ -218,9 +298,20 @@ PROCESS_THREAD(node_process, ev, data)
     net_init(NULL);
   }
 
+  
+  //Add TSCH schedule here
+  #if WITH_SQUATIX
+    squatix_init();
+  #endif /* WITH_SQUATIX */
+
+  // #if WITH_ORCHESTRA
+  //   orchestra_init();
+  // #endif /* WITH_ORCHESTRA */
+
+
 ///////////////////////////////////////////////////////////
-//  rest_init_engine();
-//  rest_activate_resource(&res_hello, "test/hello");
+ // rest_init_engine();
+ // rest_activate_resource(&res_hello, "test/hello");
 //  rest_activate_resource(&res_push, "test/push");
   // Activate more resources below
 // #if PLATFORM_HAS_LEDS
@@ -235,51 +326,16 @@ PROCESS_THREAD(node_process, ev, data)
   // End of activate resources
 ///////////////////////////////////////////////////////////
 
-//Add TSCH schedule here
-    #if WITH_SQUATIX
-  squatix_init();
-#endif /* WITH_SQUATIX */
 
-#if WITH_ORCHESTRA
-  orchestra_init();
-#endif /* WITH_ORCHESTRA */
   // PRINTF("NODE_TEST1");
   /* Print out routing tables every minute */
-  etimer_set(&et, CLOCK_SECOND * 30);
+  etimer_set(&et, CLOCK_SECOND * 20);
+  // temp_string = uip_ipaddr_printf(get_default_router_ipaddr())  ;
   while(1) {
-    print_network_status();
-
-
-  
-///////////////////////////////////////////
-// if(ev == sensors_event) {
-//       PRINTF("*******BUTTON*******\n");
-
-//       // Call the event_handler for this application-specific event. 
-//       res_event.trigger();
-
-//       /* Also call the separate response example handler. */
-//       res_separate.resume();
-//     }
-//////////////////////////////////////
-    // sf = tsch_schedule_get_slotframe_by_handle(1);
-  
+    // print_network_status();
+    printf("NODDDDDEEE");
+    printf("%s",uip_ipaddr_printf(get_default_router_ipaddr()));
     PROCESS_YIELD_UNTIL(etimer_expired(&et));
-    // tsch_schedule_remove_slotframe(sf);
-    // printf("NODE_TEST3");
-    // tsch_schedule_print();
-
-    // sf = tsch_schedule_get_slotframe_by_handle(0);
-    // link = list_head(sf->links_list);
-    // while(link!=NULL){
-    //   link->link_type=1;
-    //   link = list_item_next(link);
-    // }
-
-  // printf("NODE_TEST1");
-  // tsch_schedule_print();
-  // printf("NODE_TEST2");
-
     etimer_reset(&et);
   }
   

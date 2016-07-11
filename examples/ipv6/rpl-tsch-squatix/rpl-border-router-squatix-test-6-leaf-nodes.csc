@@ -64,8 +64,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>89.2850841707509</x>
-        <y>54.90470617322232</y>
+        <x>110.56602307366657</x>
+        <y>50.52333639909263</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -171,10 +171,10 @@
   </simulation>
   <plugin>
     org.contikios.cooja.plugins.SimControl
-    <width>234</width>
-    <z>4</z>
+    <width>281</width>
+    <z>0</z>
     <height>158</height>
-    <location_x>162</location_x>
+    <location_x>222</location_x>
     <location_y>2</location_y>
   </plugin>
   <plugin>
@@ -185,11 +185,11 @@
       <skin>org.contikios.cooja.plugins.skins.GridVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.TrafficVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
-      <viewport>1.9172086431961917 0.0 0.0 1.9172086431961917 -31.359953262481305 41.89969601393421</viewport>
+      <viewport>1.5976738693301598 0.0 0.0 1.5976738693301598 -6.96662771873445 9.416413344945157</viewport>
     </plugin_config>
-    <width>159</width>
+    <width>220</width>
     <z>1</z>
-    <height>251</height>
+    <height>161</height>
     <location_x>1</location_x>
     <location_y>1</location_y>
   </plugin>
@@ -201,8 +201,8 @@
       <coloring />
     </plugin_config>
     <width>821</width>
-    <z>0</z>
-    <height>310</height>
+    <z>3</z>
+    <height>442</height>
     <location_x>502</location_x>
     <location_y>2</location_y>
   </plugin>
@@ -225,7 +225,7 @@
       <zoomfactor>200.0</zoomfactor>
     </plugin_config>
     <width>1325</width>
-    <z>3</z>
+    <z>4</z>
     <height>280</height>
     <location_x>0</location_x>
     <location_y>444</location_y>
@@ -252,11 +252,11 @@
       <showdups>false</showdups>
       <hidenodests>false</hidenodests>
     </plugin_config>
-    <width>500</width>
+    <width>499</width>
     <z>2</z>
-    <height>300</height>
-    <location_x>2</location_x>
-    <location_y>215</location_y>
+    <height>287</height>
+    <location_x>1</location_x>
+    <location_y>160</location_y>
   </plugin>
 </simconf>
 

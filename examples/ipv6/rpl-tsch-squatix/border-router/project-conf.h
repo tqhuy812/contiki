@@ -52,11 +52,14 @@
 
 /////////////6TiSCH MINIMAL TEST with NON-STORING MOP/////////////////
 #undef TSCH_CONF_DEFAULT_HOPPING_SEQUENCE
-#define TSCH_CONF_DEFAULT_HOPPING_SEQUENCE TSCH_HOPPING_SEQUENCE_4_4
+#define TSCH_CONF_DEFAULT_HOPPING_SEQUENCE TSCH_HOPPING_SEQUENCE_1_1
 
 #undef RPL_CONF_OF
 #define RPL_CONF_OF rpl_of0
 
+/* Multiplies with chunk size, be aware of memory constraints. */
+#undef COAP_MAX_OPEN_TRANSACTIONS
+#define COAP_MAX_OPEN_TRANSACTIONS     4 
 /* RPL storing mode */
 // #undef RPL_CONF_MOP
 // #define RPL_CONF_MOP RPL_MOP_NON_STORING
@@ -77,11 +80,6 @@
 // #define RPL_CONF_WITH_DAO_ACK          0
 /////////////////////////////////////////////////////
 
-
-
-#ifndef UIP_CONF_BUFFER_SIZE
-#define UIP_CONF_BUFFER_SIZE    140
-#endif
 
 #ifndef UIP_CONF_RECEIVE_WINDOW
 #define UIP_CONF_RECEIVE_WINDOW  60
@@ -133,7 +131,7 @@
 // /* TSCH logging. 0: disabled. 1: basic log. 2: with delayed
 //  * log messages from interrupt */
 #undef TSCH_LOG_CONF_LEVEL
-#define TSCH_LOG_CONF_LEVEL 0
+#define TSCH_LOG_CONF_LEVEL 1
 
 /* IEEE802.15.4 PANID */
 #undef IEEE802154_CONF_PANID
@@ -159,13 +157,20 @@
 #undef QUEUEBUF_CONF_NUM
 #define QUEUEBUF_CONF_NUM 4 //default 4
 
+// #undef NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE
+// #define NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE 8
+
 #undef UIP_CONF_BUFFER_SIZE
-#define UIP_CONF_BUFFER_SIZE    140
+#define UIP_CONF_BUFFER_SIZE    180
+
+/* Increase rpl-border-router IP-buffer when using more than 64. */
+#undef REST_MAX_CHUNK_SIZE
+#define REST_MAX_CHUNK_SIZE           30
 
 #undef UIP_CONF_MAX_ROUTES
 #define UIP_CONF_MAX_ROUTES  8 //original value: 8
 #undef NBR_TABLE_CONF_MAX_NEIGHBORS
-#define NBR_TABLE_CONF_MAX_NEIGHBORS 8   //original value: 8
+#define NBR_TABLE_CONF_MAX_NEIGHBORS 5   //original value: 8
 #undef UIP_CONF_ND6_SEND_NA
 #define UIP_CONF_ND6_SEND_NA 0
 #undef SICSLOWPAN_CONF_FRAG

@@ -23,25 +23,25 @@ const struct squatix_rule *all_rules[] = SQUATIX_RULES;
 #define NUM_RULES (sizeof(all_rules) / sizeof(struct squatix_rule *))
 
 /*---------------------------------------------------------------------------*/
-static void
-squatix_packet_received(void)
-{
-}
+// static void
+// squatix_packet_received(void)
+// {
+// }
 /*---------------------------------------------------------------------------*/
-static void
-squatix_packet_sent(int mac_status)
-{
-  /* Check if our parent just ACKed a DAO */
-  if(squatix_parent_knows_us == 0
-     && mac_status == MAC_TX_OK
-     && packetbuf_attr(PACKETBUF_ATTR_NETWORK_ID) == UIP_PROTO_ICMP6
-     && packetbuf_attr(PACKETBUF_ATTR_CHANNEL) == (ICMP6_RPL << 8 | RPL_CODE_DAO)) {
-    if(!linkaddr_cmp(&squatix_parent_linkaddr, &linkaddr_null)
-       && linkaddr_cmp(&squatix_parent_linkaddr, packetbuf_addr(PACKETBUF_ADDR_RECEIVER))) {
-      squatix_parent_knows_us = 1;
-    }
-  }
-}
+// static void
+// squatix_packet_sent(int mac_status)
+// {
+//   /* Check if our parent just ACKed a DAO */
+//   if(squatix_parent_knows_us == 0
+//      && mac_status == MAC_TX_OK
+//      && packetbuf_attr(PACKETBUF_ATTR_NETWORK_ID) == UIP_PROTO_ICMP6
+//      && packetbuf_attr(PACKETBUF_ATTR_CHANNEL) == (ICMP6_RPL << 8 | RPL_CODE_DAO)) {
+//     if(!linkaddr_cmp(&squatix_parent_linkaddr, &linkaddr_null)
+//        && linkaddr_cmp(&squatix_parent_linkaddr, packetbuf_addr(PACKETBUF_ADDR_RECEIVER))) {
+//       squatix_parent_knows_us = 1;
+//     }
+//   }
+// }
 /*---------------------------------------------------------------------------*/
 void
 squatix_callback_child_added(const linkaddr_t *addr)

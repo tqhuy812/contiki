@@ -28,11 +28,11 @@ get_node_timeslot(const linkaddr_t *addr)
   }
 }
 /*---------------------------------------------------------------------------*/
-static int
-neighbor_has_uc_link(const linkaddr_t *linkaddr)
-{
+// static int
+// neighbor_has_uc_link(const linkaddr_t *linkaddr)
+// {
   //PRINTF("parent_has_uc_link");
-  if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
+  // if(linkaddr != NULL && !linkaddr_cmp(linkaddr, &linkaddr_null)) {
     // PRINTF("parent_has_uc_link1");
     // if((squatix_parent_knows_us || !SQUATIX_UNICAST_SENDER_BASED)
     //    && linkaddr_cmp(&squatix_parent_linkaddr, linkaddr)) {
@@ -43,10 +43,10 @@ neighbor_has_uc_link(const linkaddr_t *linkaddr)
     //   PRINTF("othernodes_have_uc_link");
     //   return 1;
     // }
-    return 1;
-  }
-  return 0;
-}
+//     return 1;
+//   }
+//   return 0;
+// }
 /*---------------------------------------------------------------------------*/
 static void
 add_uc_link(const linkaddr_t *linkaddr)

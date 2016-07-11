@@ -58,7 +58,7 @@
 /* TSCH logging. 0: disabled. 1: basic log. 2: with delayed
 * log messages from interrupt */
 #undef TSCH_LOG_CONF_LEVEL
-#define TSCH_LOG_CONF_LEVEL 0
+#define TSCH_LOG_CONF_LEVEL 1
 
 /* TSCH and RPL callbacks */
 
@@ -91,15 +91,15 @@
 
 /////////////6TiSCH MINIMAL TEST/////////////////
 #undef TSCH_CONF_DEFAULT_HOPPING_SEQUENCE
-#define TSCH_CONF_DEFAULT_HOPPING_SEQUENCE TSCH_HOPPING_SEQUENCE_4_4
+#define TSCH_CONF_DEFAULT_HOPPING_SEQUENCE TSCH_HOPPING_SEQUENCE_1_1
 
 /* RPL storing mode */
 // #undef RPL_CONF_MOP
 // #define RPL_CONF_MOP RPL_MOP_STORING_NO_MULTICAST
 /////////////////////////////////////////////////
 
-#undef ENABLE_COOJA_DEBUG
-#define ENABLE_COOJA_DEBUG 0
+// #undef ENABLE_COOJA_DEBUG
+// #define ENABLE_COOJA_DEBUG 0
 
 //////////////////////////////////////////////////
 // Start of adding define for CoAP
@@ -110,7 +110,7 @@
 
 /* Increase rpl-border-router IP-buffer when using more than 64. */
 #undef REST_MAX_CHUNK_SIZE
-#define REST_MAX_CHUNK_SIZE            48
+#define REST_MAX_CHUNK_SIZE            30
 
 /* Multiplies with chunk size, be aware of memory constraints. */
 #undef COAP_MAX_OPEN_TRANSACTIONS
@@ -145,10 +145,20 @@
 #undef UIP_CONF_UDP_CHECKSUMS
 #define UIP_CONF_UDP_CHECKSUMS   1
 
+// #undef NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE
+// #define NETSTACK_CONF_RDC_CHANNEL_CHECK_RATE 8
+
 //Newly added from project_conf.h file of rpl-tsch/node
 #undef QUEUEBUF_CONF_NUM
 #define QUEUEBUF_CONF_NUM 4 //default 4
 
+/* IP buffer size must match all other hops, in particular the border router. */
+#undef UIP_CONF_BUFFER_SIZE
+#define UIP_CONF_BUFFER_SIZE           185
+
+/* Increase rpl-border-router IP-buffer when using more than 64. */
+#undef REST_MAX_CHUNK_SIZE
+#define REST_MAX_CHUNK_SIZE            31
 
 #undef UIP_CONF_MAX_ROUTES
 #define UIP_CONF_MAX_ROUTES  8	//original value: 8

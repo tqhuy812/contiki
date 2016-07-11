@@ -87,6 +87,7 @@ tsch_rpl_callback_new_dio_interval(uint8_t dio_interval)
     /* Set EB period */
     tsch_set_eb_period(TSCH_EB_PERIOD);
     /* Set join priority based on RPL rank */
+    // PRINTF("TSCH-RPLLLLLLLL: %u ",DAG_RANK(dag->rank, dag->instance) - 1);
     tsch_set_join_priority(DAG_RANK(dag->rank, dag->instance) - 1);
   } else {
     tsch_set_eb_period(0);

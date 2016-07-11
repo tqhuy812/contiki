@@ -1,3 +1,3 @@
 #squatix-br_src = squatix-br.c squatix-rule-default-common.c #squatix-rule-eb-per-time-source.c squatix-rule-unicast-per-neighbor-rpl-storing.c #squatix-rule-unicast-per-neighbor-rpl-ns.c
 
-squatix-br_src = squatix-br.c squatix-rule-default-common.c #squatix-rule-unicast-per-neighbor-rpl-storing.c 
+squatix-br_src = squatix-br.c squatix-rule-default-common.c squatix-rule-unicast-per-neighbor-rpl-storing.c 
