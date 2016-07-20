@@ -85,7 +85,7 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
   if(*offset + (int32_t)strpos > CHUNKS_TOTAL) {
     strpos = CHUNKS_TOTAL - *offset;
   }
-  REST.set_response_payload(response, buffer, strpos);
+  REST.set_response_payload (response, buffer, strpos);
 
   /* IMPORTANT for chunk-wise resources: Signal chunk awareness to REST engine. */
   *offset += strpos;

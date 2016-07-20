@@ -158,8 +158,7 @@ PROCESS_THREAD(border_router_process, ev, data)
 
 rest_init_engine();
 
-rest_activate_resource(&res_routing_info, "test/hello");
-// rest_activate_resource(&res_routing_table, "test/routing table");
+rest_activate_resource(&res_routing_info, "test/routing info");
 
 
 /*-------------- Loop to send routing table routinely------------------------*/

@@ -9,7 +9,9 @@
 #include "net/ip/uip.h"
 #include "net/ipv6/uip-ds6.h"
 #include "net/rpl/rpl.h"
+#include "net/rpl/rpl-private.h"
 #include "simple-udp.h"
+
 
 
 
@@ -31,7 +33,6 @@ RESOURCE(res_routing_info,
 
 
 /*---------FUNCTION TO CREATE ROUTING TABLE----------------*/
-
 static 
 char*
 uip_ipaddr_printf(const uip_ipaddr_t *addr)
@@ -53,7 +54,6 @@ uip_ipaddr_printf(const uip_ipaddr_t *addr)
     return full_ipaddr;
   }
 #if NETSTACK_CONF_WITH_IPV6
-
   if(ip64_addr_is_ipv4_mapped_addr(addr)) {
     // PRINTA("::FFFF:%u.%u.%u.%u", addr->u8[12], addr->u8[13], addr->u8[14], addr->u8[15]);
     sprintf(full_ipaddr,"::FFFF:%u.%u.%u.%u", addr->u8[12], addr->u8[13], addr->u8[14], addr->u8[15]);
@@ -92,7 +92,7 @@ return full_ipaddr;
   sprintf(full_ipaddr,"%u.%u.%u.%u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
 #endif /* NETSTACK_CONF_WITH_IPV6 */
 }
-
+/*---------------------------------------------------------------------------*/
 /*-----Return ipaddr of the parent node (default router) of a node-----*/ //====OK====
 static uip_ipaddr_t *get_default_router_ipaddr(void)
 {
@@ -105,6 +105,21 @@ static uip_ipaddr_t *get_default_router_ipaddr(void)
     return parent_node_ipaddr;
   }
   else return NULL;
+}
+/*---------------------------------------------------------------------------*/
+static rpl_rank_t get_node_rank(void)
+{
+  rpl_instance_t *default_instance = rpl_get_default_instance();
+  rpl_parent_t *parent = nbr_table_head(rpl_parents);
+  while (parent!=NULL){
+    if (parent == default_instance->current_dag->preferred_parent){
+      printf("AAA");
+      return rpl_rank_via_parent(parent);
+    }
+    printf("BBB");
+    parent = nbr_table_next(rpl_parents, parent);
+  }
+  return INFINITE_RANK;
 }
 /*---------------------------------------------------------------------------*/
 /*-----Return ipaddr of the child node-----*/
@@ -144,22 +159,32 @@ static uip_ipaddr_t *get_default_router_ipaddr(void)
 // }
 //===================================================
 
-/*---------FUNCTION TO CREATE THE ROUTING TABLE----------------*/
+#define CHUNKS_TOTAL    2050
 
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-  const char *len = NULL;
-  /* Some data that has the length up to REST_MAX_CHUNK_SIZE. For more, see the chunk resource. */
-  // char const *const message = "Hello World! ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy";
-  char *message = uip_ipaddr_printf(get_default_router_ipaddr());
-  int length = REST_MAX_CHUNK_SIZE; /*           |<-------->| */
+  
+  // char *message = uip_ipaddr_printf(get_default_router_ipaddr());
+    int length = REST_MAX_CHUNK_SIZE + 10;
+  char *message = malloc(length);
 
-  /* The query string can be retrieved by rest_get_query() or parsed for its key-value pairs. */
+  // snprintf((char *)buffer,length,"{\"Parent\":\"%s\"}",message);
+  // snprintf((char *)buffer,length,"{\"parentAddr\":\"Node\"}");
+  // snprintf((char *)buffer,length,"{\"Rank\":%u}",get_node_rank());
 
-    memcpy(buffer, message, length);
+  // snprintf(message,length,"{\"Parent\":\"%s\"},",uip_ipaddr_printf(get_default_router_ipaddr()));
+  snprintf(message,2,"{");
+  snprintf(message+strlen((char *)message),length,"\"Parent\":\"%s\"",uip_ipaddr_printf(get_default_router_ipaddr()));
+  snprintf(message+strlen((char *)message),2,",");
+  snprintf(message+strlen((char *)message),length,"\"Rank\":%u",get_node_rank());
+  snprintf(message+strlen((char *)message),2,"}");
+  snprintf((char *)buffer,strlen((char *)message),message);
 
-   REST.set_header_content_type(response, REST.type.APPLICATION_JSON); /* text/plain is the default, hence this option could be omitted. */
-  REST.set_header_etag(response, (uint8_t *)&length, 1);
-  REST.set_response_payload(response, buffer, length);
+
+  REST.set_header_content_type(response, REST.type.APPLICATION_JSON); /* text/plain is the default, hence this option could be omitted. */
+  // REST.set_header_etag(response, (uint8_t *)&length, 1);
+  // REST.set_response_payload(response, buffer, length);
+  REST.set_response_payload(response, buffer, strlen((char *)message));
+  free(message);
 }
