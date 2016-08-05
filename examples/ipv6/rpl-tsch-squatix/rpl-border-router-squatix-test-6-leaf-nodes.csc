@@ -82,8 +82,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>88.15231215698965</x>
-        <y>26.775527706025123</y>
+        <x>106.92961118897405</x>
+        <y>76.2224151569174</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -100,8 +100,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>80.72241881916915</x>
-        <y>-1.5581184368028715</y>
+        <x>100.12562781888639</x>
+        <y>-12.824497855993519</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -118,8 +118,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>18.538290848223784</x>
-        <y>45.99804325901369</y>
+        <x>34.81195000927694</x>
+        <y>47.24986319447932</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -136,8 +136,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>42.16829202598363</x>
-        <y>17.519905572059212</y>
+        <x>118.5293080893869</x>
+        <y>11.886715862463893</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -185,11 +185,11 @@
       <skin>org.contikios.cooja.plugins.skins.GridVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.TrafficVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
-      <viewport>1.5976738693301598 0.0 0.0 1.5976738693301598 -6.96662771873445 9.416413344945157</viewport>
+      <viewport>1.5976738693301598 0.0 0.0 1.5976738693301598 66.03337228126557 79.41641334494516</viewport>
     </plugin_config>
-    <width>220</width>
+    <width>357</width>
     <z>1</z>
-    <height>161</height>
+    <height>298</height>
     <location_x>1</location_x>
     <location_y>1</location_y>
   </plugin>

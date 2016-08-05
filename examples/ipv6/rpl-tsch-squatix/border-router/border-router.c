@@ -29,19 +29,19 @@
 #include "squatix-br.h"
 #endif /* WITH_SQUATIX */
 
-#if WITH_ORCHESTRA
-#include "orchestra-br.h"
-#endif /* WITH_ORCHESTRA */
+// #if WITH_ORCHESTRA
+// #include "orchestra-br.h"
+// #endif /* WITH_ORCHESTRA */
 
 static uip_ipaddr_t prefix;
 static uint8_t prefix_set;
 
-static  uip_ipaddr_t child_node_ipaddr[UIP_CONF_MAX_ROUTES];
-static uip_ipaddr_t nbr_node_ipaddr[NBR_TABLE_CONF_MAX_NEIGHBORS];
+// static  uip_ipaddr_t child_node_ipaddr[UIP_CONF_MAX_ROUTES];
+// static uip_ipaddr_t nbr_node_ipaddr[NBR_TABLE_CONF_MAX_NEIGHBORS];
 
 
 extern resource_t
-  // res_routing_table,
+  // res_routing_info,
   res_routing_info;
   // res_hello;
 
@@ -158,11 +158,12 @@ PROCESS_THREAD(border_router_process, ev, data)
 
 rest_init_engine();
 
-rest_activate_resource(&res_routing_info, "test/routing info");
+  // rest_activate_resource(&res_routing_info, "test/routing-info");
+rest_activate_resource(&res_routing_info, "test/routing-info");
 
 
 /*-------------- Loop to send routing table routinely------------------------*/
-  etimer_set(&et, CLOCK_SECOND * 15); //Change to *30 to observe the Routing Table more frequently
+  etimer_set(&et, CLOCK_SECOND * 30); //Change to *30 to observe the Routing Table more frequently
   while(1) {
     PROCESS_YIELD_UNTIL(etimer_expired(&et) ); 
     etimer_reset(&et);

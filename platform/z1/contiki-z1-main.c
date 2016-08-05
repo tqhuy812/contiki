@@ -44,7 +44,7 @@
 #include "net/netstack.h"
 #include "net/mac/frame802154.h"
 #include "dev/button-sensor.h"
-#include "dev/adxl345.h"
+// #include "dev/adxl345.h"
 #include "sys/clock.h"
 
 #if NETSTACK_CONF_WITH_IPV6
@@ -279,7 +279,7 @@ main(int argc, char **argv)
   set_rime_addr();
 
   cc2420_init();
-  accm_init();
+  // accm_init();
 
   {
     uint8_t longaddr[8];

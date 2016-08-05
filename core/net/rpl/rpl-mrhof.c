@@ -52,6 +52,7 @@
 #include "net/link-stats.h"
 
 #define DEBUG DEBUG_NONE
+// #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
 /* RFC6551 and RFC6719 do not mandate the use of a specific formula to
@@ -201,7 +202,7 @@ best_parent(rpl_parent_t *p1, rpl_parent_t *p2)
   uint16_t p2_cost;
   int p1_is_acceptable;
   int p2_is_acceptable;
-
+  printf("ggggggg");
   p1_is_acceptable = p1 != NULL && parent_is_acceptable(p1);
   p2_is_acceptable = p2 != NULL && parent_is_acceptable(p2);
 

@@ -84,10 +84,10 @@ squatix_callback_packet_ready(void)
     }
   }
 
-#if TSCH_WITH_LINK_SELECTOR
-  packetbuf_set_attr(PACKETBUF_ATTR_TSCH_SLOTFRAME, slotframe);
-  packetbuf_set_attr(PACKETBUF_ATTR_TSCH_TIMESLOT, timeslot);
-#endif
+// #if TSCH_WITH_LINK_SELECTOR
+//   packetbuf_set_attr(PACKETBUF_ATTR_TSCH_SLOTFRAME, slotframe);
+//   packetbuf_set_attr(PACKETBUF_ATTR_TSCH_TIMESLOT, timeslot);
+// #endif
 }
 /*---------------------------------------------------------------------------*/
 void

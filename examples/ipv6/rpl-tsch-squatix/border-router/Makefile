@@ -21,6 +21,7 @@ PROJECT_SOURCEFILES += slip-bridge.c
 SMALL=1
 
 
+
 MODULES += core/net/mac/tsch
 # APPS += orchestra-br
 APPS += squatix-br

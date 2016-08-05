@@ -5,19 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rest-engine.h"
+ #include <stdlib.h>
+#include <string.h>
+#include "rest-engine.h"
 #include "net/ip/ip64-addr.h"
 #include "net/ip/uip.h"
 #include "net/ipv6/uip-ds6.h"
 #include "net/rpl/rpl.h"
 #include "net/rpl/rpl-private.h"
 #include "simple-udp.h"
-
-
-
-
+#include "er-coap.h"
 
 static void res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
-
 /*
  * A handler function named [resource name]_handler must be implemented for each RESOURCE.
  * A buffer for the response payload is provided through the buffer pointer. Simple resources can ignore
@@ -30,6 +29,7 @@ RESOURCE(res_routing_info,
          NULL,
          NULL,
          NULL);
+
 
 
 /*---------FUNCTION TO CREATE ROUTING TABLE----------------*/
@@ -62,28 +62,31 @@ uip_ipaddr_printf(const uip_ipaddr_t *addr)
   else {
     for(i = 0, f = 0; i < sizeof(uip_ipaddr_t); i += 2) {
       a = (addr->u8[i] << 8) + addr->u8[i + 1];
-      if(a == 0 && f >= 0) {
+     if(a == 0 && f >= 0) {
         if(f++ == 0) {
+          continue; //Add this line to omit "::" in the addr in the payload
           //PRINTA("::");
           strcpy(temp,full_ipaddr);
           sprintf(full_ipaddr,"%s::",temp);
         } /* END OF (f++ == 0) */
       } /* END OF (a == 0 && f >= 0) */
       else {
-        
+        if (a != 0xfe80){ //Add this line to omit the prefix "fe80" in the addr in the payload
           if(f > 0) {
             f = -1;
           } 
-          else 
+          else {
             if(i > 0) {
               // PRINTA(":");
               strcpy(temp,full_ipaddr);
               sprintf(full_ipaddr,"%s:",temp);
             }
-              strcpy(temp,full_ipaddr);
-              sprintf(full_ipaddr,"%s%x",temp,a);
-        } /* END OF else */
-
+          }
+          strcpy(temp,full_ipaddr);
+          sprintf(full_ipaddr,"%s%x",temp,a);
+        } //Add this line to omit the prefix "fe80" in the addr in the payload
+      } /* END OF else */
+        
     }
   }
 return full_ipaddr;
@@ -107,84 +110,95 @@ static uip_ipaddr_t *get_default_router_ipaddr(void)
   else return NULL;
 }
 /*---------------------------------------------------------------------------*/
-static rpl_rank_t get_node_rank(void)
-{
-  rpl_instance_t *default_instance = rpl_get_default_instance();
-  rpl_parent_t *parent = nbr_table_head(rpl_parents);
-  while (parent!=NULL){
-    if (parent == default_instance->current_dag->preferred_parent){
-      printf("AAA");
-      return rpl_rank_via_parent(parent);
-    }
-    printf("BBB");
-    parent = nbr_table_next(rpl_parents, parent);
-  }
-  return INFINITE_RANK;
-}
-/*---------------------------------------------------------------------------*/
-/*-----Return ipaddr of the child node-----*/
-// static
-// void
-// // // uip_ipaddr_t*
-// get_child_node_ipaddr(void)  /*======OK======*/
+// static rpl_rank_t get_node_rank(void)
 // {
-//   uip_ds6_route_t *route;
-//   uint8_t i=0;
-  
-//   route = uip_ds6_route_head();
-//   while(route != NULL) {
-//     memcpy(&child_node_ipaddr[i],&route->ipaddr,sizeof(uip_ipaddr_t));
-//     route = uip_ds6_route_next(route);
-//     i++;
-//   }
-//   // // return child_node_ipaddr;
-// }
-/*-------------------------------------------------------*/
-/*-----Return ipaddr of the neighbor node-----*/
-// static 
-// // // uip_ipaddr_t*
-// void
-// get_nbr_node_ipaddr(void)   /*======OK======*/
-// {
-//   uip_ds6_route_t *route;
+//   rpl_instance_t *default_instance = rpl_get_default_instance();
+//   rpl_parent_t *parent = nbr_table_head(rpl_parents);
+//   while (parent!=NULL){
+//     if (parent == default_instance->current_dag->preferred_parent){
+//       return rpl_rank_via_parent(parent);
+//     }
 
-//   route = uip_ds6_route_head();
-//   uint8_t i=0;
-//   while(route != NULL) {
-//     memcpy(&nbr_node_ipaddr[i],uip_ds6_route_nexthop(route),sizeof(uip_ipaddr_t));
-//     route = uip_ds6_route_next(route);
-//     i++;
+//     parent = nbr_table_next(rpl_parents, parent);
 //   }
-//   // // return nbr_node_ipaddr;
+//   return INFINITE_RANK;
 // }
-//===================================================
 
 #define CHUNKS_TOTAL    2050
 
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-  
-  // char *message = uip_ipaddr_printf(get_default_router_ipaddr());
-    int length = REST_MAX_CHUNK_SIZE + 10;
+    // int32_t strpos = 0;
+  int length = 45;
+  preferred_size = 64;
   char *message = malloc(length);
+  memset(message,0,length);
+  // snprintf(message, length, "{\"P\":\"%s\",\"R\":%u}",uip_ipaddr_printf(get_default_router_ipaddr()),get_node_rank());
+  snprintf(message, length, "{\"P\":\"%s\"}",uip_ipaddr_printf(get_default_router_ipaddr()));
+  // // preferred_size = COAP_MAX_BLOCK_SIZE;
+
+  // /* Check the offset for boundaries of the resource data. */
+  // if(*offset >= CHUNKS_TOTAL) {
+  //   REST.set_response_status(response, REST.status.BAD_OPTION);
+  //   /* A block error message should not exceed the minimum block size (16). */
+
+  //   const char *error_msg = "BlockOutOfScope";
+  //   REST.set_response_payload(response, error_msg, strlen(error_msg));
+  //   return;
+  // }
+
+  // /* Generate data until reaching CHUNKS_TOTAL. */
+  // while(strpos < preferred_size) {
+  //   // strpos += snprintf((char *)buffer + strpos, preferred_size - strpos + 1, "|%ld|", *offset);
+  // // strpos += snprintf((char *)buffer + strpos, preferred_size - strpos + 1, "{\"Parent\":\"%s\",\"Rank\":%u}",uip_ipaddr_printf(get_default_router_ipaddr()),get_node_rank());
+  // strpos += snprintf((char *)buffer + strpos, preferred_size - strpos + 1,(char *)message+strpos);
+
+  // // snprintf(message,2,"{");
+  // // snprintf(message+strlen((char *)message),length,"\"Parent\":\"%s\"",uip_ipaddr_printf(get_default_router_ipaddr()));
+  // // snprintf(message+strlen((char *)message),2,",");
+  // // snprintf(message+strlen((char *)message),length,"\"Rank\":%u",get_node_rank());
+  // // snprintf(message+strlen((char *)message),2,"}");
+  // // snprintf((char *)buffer,strlen((char *)message),message);
+
+  // }
+
+  // printf("AAAprefered size: %u",preferred_size);
+  // /* snprintf() does not adjust return value if truncated by size. */
+  // if(strpos > preferred_size) {
+  //   strpos = preferred_size;
+  //   /* Truncate if above CHUNKS_TOTAL bytes. */
+  // }
+  // if(*offset + (int32_t)strpos > CHUNKS_TOTAL) {
+  //   strpos = CHUNKS_TOTAL - *offset;
+  // }
+  // REST.set_response_payload(response, buffer, strpos);
+
+  // /* IMPORTANT for chunk-wise resources: Signal chunk awareness to REST engine. */
+  // *offset += strpos;
+
+  // /* Signal end of resource representation. */
+  // if(*offset >= CHUNKS_TOTAL) {
+  //   *offset = -1;
+  // }
+
+
+  // char *message = uip_ipaddr_printf(get_default_router_ipaddr());
+
 
   // snprintf((char *)buffer,length,"{\"Parent\":\"%s\"}",message);
   // snprintf((char *)buffer,length,"{\"parentAddr\":\"Node\"}");
   // snprintf((char *)buffer,length,"{\"Rank\":%u}",get_node_rank());
 
   // snprintf(message,length,"{\"Parent\":\"%s\"},",uip_ipaddr_printf(get_default_router_ipaddr()));
-  snprintf(message,2,"{");
-  snprintf(message+strlen((char *)message),length,"\"Parent\":\"%s\"",uip_ipaddr_printf(get_default_router_ipaddr()));
-  snprintf(message+strlen((char *)message),2,",");
-  snprintf(message+strlen((char *)message),length,"\"Rank\":%u",get_node_rank());
-  snprintf(message+strlen((char *)message),2,"}");
-  snprintf((char *)buffer,strlen((char *)message),message);
+
+  snprintf((char *)buffer,strlen((char *)message)+3,message);
 
 
   REST.set_header_content_type(response, REST.type.APPLICATION_JSON); /* text/plain is the default, hence this option could be omitted. */
   // REST.set_header_etag(response, (uint8_t *)&length, 1);
   // REST.set_response_payload(response, buffer, length);
-  REST.set_response_payload(response, buffer, strlen((char *)message));
+
+  REST.set_response_payload(response, buffer, strlen((char *)buffer));
   free(message);
 }

@@ -127,6 +127,7 @@ coap_receive(void)
             PRINTF("Blockwise: block request %lu (%u/%u) @ %lu bytes\n",
                    block_num, block_size, COAP_MAX_BLOCK_SIZE, block_offset);
             block_size = MIN(block_size, COAP_MAX_BLOCK_SIZE);
+            // block_size = COAP_MAX_BLOCK_SIZE;
             new_offset = block_offset;
           }
 

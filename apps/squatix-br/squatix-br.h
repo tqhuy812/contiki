@@ -19,6 +19,7 @@ struct squatix_rule eb_per_time_source;
 struct squatix_rule unicast_per_neighbor_rpl_storing;
 struct squatix_rule unicast_per_neighbor_rpl_ns;
 struct squatix_rule default_common;
+struct squatix_rule all_ts;
 
 extern linkaddr_t squatix_parent_linkaddr;
 extern int squatix_parent_knows_us;

@@ -39,7 +39,7 @@ init(uint16_t sf_handle)
   struct tsch_slotframe *sf_common = tsch_schedule_add_slotframe(slotframe_handle, SQUATIX_COMMON_SHARED_PERIOD);
   tsch_schedule_add_link(sf_common,
       LINK_OPTION_RX | LINK_OPTION_TX | LINK_OPTION_SHARED,
-      SQUATIX_COMMON_SHARED_TYPE, &tsch_broadcast_address,
+      LINK_TYPE_ADVERTISING, &tsch_broadcast_address,
       0, channel_offset);
 }
 /*---------------------------------------------------------------------------*/

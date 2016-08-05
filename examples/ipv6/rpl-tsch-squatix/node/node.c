@@ -4,7 +4,7 @@
 #include "net/mac/tsch/tsch.h"
 #include "net/mac/tsch/tsch-private.h"
 #include "net/rpl/rpl-private.h"
-#include "net/mac/tsch/tsch-schedule.h"
+
 #include "net/ip/uip-debug.h"
 
 #include "net/ipv6/uip-ds6-route.h"
@@ -58,6 +58,7 @@
  * The build system automatically compiles the resources in the corresponding sub-directory.
  */
 extern resource_t
+  res_cell,
   res_routing_info;
   // res_hello,
 
@@ -135,13 +136,14 @@ PROCESS_THREAD(node_process, ev, data)
 
 ///////////////////////////////////////////////////////////
  rest_init_engine();
- // rest_activate_resource(&res_hello, "test/hello");
   rest_activate_resource(&res_routing_info, "test/routing-info");
+  rest_activate_resource(&res_cell, "test/cell");
 
-  etimer_set(&et, CLOCK_SECOND * 30);
-  // temp_string = uip_ipaddr_printf(get_default_router_ipaddr())  ;
+  etimer_set(&et, CLOCK_SECOND * 60);
   while(1) {
-
+    // squatix_init();
+    printf("SCHEEEEEDULE: ");
+    tsch_schedule_print();
     PROCESS_YIELD_UNTIL(etimer_expired(&et));
     etimer_reset(&et);
   }

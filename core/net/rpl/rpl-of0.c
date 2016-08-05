@@ -48,6 +48,7 @@
 #include "net/link-stats.h"
 
 #define DEBUG DEBUG_NONE
+// #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
 /* Constants from RFC6552. We use the default values. */
@@ -206,7 +207,7 @@ best_dag(rpl_dag_t *d1, rpl_dag_t *d2)
   if(d1->grounded != d2->grounded) {
     return d1->grounded ? d1 : d2;
   }
-
+  printf("dddddd");
   if(d1->preference != d2->preference) {
     return d1->preference > d2->preference ? d1 : d2;
   }

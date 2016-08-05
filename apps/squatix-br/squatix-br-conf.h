@@ -9,8 +9,8 @@
  * - a sender-based or receiver-based slotframe for unicast to RPL parents and children
  * - a common shared slotframe for any other traffic (mostly broadcast)
  *  */
-#define SQUATIX_RULES { &unicast_per_neighbor_rpl_storing, &default_common }
-// #define SQUATIX_RULES { &default_common }
+// #define SQUATIX_RULES { &unicast_per_neighbor_rpl_storing, &default_common, &all_ts }
+#define SQUATIX_RULES { &all_ts }
 /* Example configuration for RPL non-storing mode: */
 /* #define SQUATIX_RULES { &eb_per_time_source, &unicast_per_neighbor_rpl_ns, &default_common } */
 
@@ -29,13 +29,13 @@
 #ifdef SQUATIX_CONF_COMMON_SHARED_PERIOD
 #define SQUATIX_COMMON_SHARED_PERIOD            SQUATIX_CONF_COMMON_SHARED_PERIOD
 #else /* SQUATIX_CONF_COMMON_SHARED_PERIOD */
-#define SQUATIX_COMMON_SHARED_PERIOD            7
+#define SQUATIX_COMMON_SHARED_PERIOD            5
 #endif /* SQUATIX_CONF_COMMON_SHARED_PERIOD */
 
 #ifdef SQUATIX_CONF_UNICAST_PERIOD
 #define SQUATIX_UNICAST_PERIOD                  SQUATIX_CONF_UNICAST_PERIOD
 #else /* SQUATIX_CONF_UNICAST_PERIOD */
-#define SQUATIX_UNICAST_PERIOD                  7
+#define SQUATIX_UNICAST_PERIOD                  5
 #endif /* SQUATIX_CONF_UNICAST_PERIOD */
 
 /* Is the per-neighbor unicast slotframe sender-based (if not, it is receiver-based).

@@ -14,7 +14,7 @@
 #include "er-coap.h"
 
 
-
+#define UIP_DS6_LOCAL_PREFIX 0xfe80
 
 
 static void res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
@@ -63,28 +63,31 @@ uip_ipaddr_printf(const uip_ipaddr_t *addr)
   else {
     for(i = 0, f = 0; i < sizeof(uip_ipaddr_t); i += 2) {
       a = (addr->u8[i] << 8) + addr->u8[i + 1];
-      if(a == 0 && f >= 0) {
+     if(a == 0 && f >= 0) {
         if(f++ == 0) {
+          // continue; //Add this line to omit "::" in the addr in the payload
           //PRINTA("::");
           strcpy(temp,full_ipaddr);
           sprintf(full_ipaddr,"%s::",temp);
         } /* END OF (f++ == 0) */
       } /* END OF (a == 0 && f >= 0) */
       else {
-        
+        if (a != UIP_DS6_LOCAL_PREFIX){ //Add this line to omit the prefix "fe80" in the addr in the payload
           if(f > 0) {
             f = -1;
           } 
-          else 
+          else {
             if(i > 0) {
               // PRINTA(":");
               strcpy(temp,full_ipaddr);
               sprintf(full_ipaddr,"%s:",temp);
             }
-              strcpy(temp,full_ipaddr);
-              sprintf(full_ipaddr,"%s%x",temp,a);
-        } /* END OF else */
-
+          }
+          strcpy(temp,full_ipaddr);
+          sprintf(full_ipaddr,"%s%x",temp,a);
+        } //Add this line to omit the prefix "fe80" in the addr in the payload
+      } /* END OF else */
+        
     }
   }
 return full_ipaddr;
@@ -114,10 +117,9 @@ static rpl_rank_t get_node_rank(void)
   rpl_parent_t *parent = nbr_table_head(rpl_parents);
   while (parent!=NULL){
     if (parent == default_instance->current_dag->preferred_parent){
-      printf("AAA");
       return rpl_rank_via_parent(parent);
     }
-    printf("BBB");
+
     parent = nbr_table_next(rpl_parents, parent);
   }
   return INFINITE_RANK;
@@ -167,9 +169,11 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
 {
   // int32_t strpos = 0;
   int length = 45;
+  preferred_size = 64;
   char *message = malloc(length);
   memset(message,0,length);
-  snprintf(message, length, "{\"P\":\"%s\",\"R\":%u}",uip_ipaddr_printf(get_default_router_ipaddr()),get_node_rank());
+  // snprintf(message, length, "{\"P\":\"%s\",\"R\":%u}",uip_ipaddr_printf(get_default_router_ipaddr()),get_node_rank());
+  snprintf(message, length, "{\"P\":\"%s\"}",uip_ipaddr_printf(get_default_router_ipaddr()));
   // // preferred_size = COAP_MAX_BLOCK_SIZE;
 
   // /* Check the offset for boundaries of the resource data. */

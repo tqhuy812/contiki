@@ -14,7 +14,7 @@
 
 /* See apps/squatix/README.md for more Orchestra configuration options */
 #define TSCH_SCHEDULE_CONF_WITH_6TISCH_MINIMAL 0 /* No 6TiSCH minimal schedule */
-#define TSCH_CONF_WITH_LINK_SELECTOR 1 /* Orchestra requires per-packet link selection */
+#define TSCH_CONF_WITH_LINK_SELECTOR 0 /* Orchestra requires per-packet link selection */
 /* Squatix callbacks */
 #define TSCH_CALLBACK_NEW_TIME_SOURCE squatix_callback_new_time_source
 #define TSCH_CALLBACK_PACKET_READY squatix_callback_packet_ready
@@ -158,12 +158,12 @@
 
 /* Increase rpl-border-router IP-buffer when using more than 64. */
 #undef REST_MAX_CHUNK_SIZE
-#define REST_MAX_CHUNK_SIZE            45
+#define REST_MAX_CHUNK_SIZE            35
 
 #undef UIP_CONF_MAX_ROUTES
-#define UIP_CONF_MAX_ROUTES  8	//original value: 8
+#define UIP_CONF_MAX_ROUTES  6	//original value: 8
 #undef NBR_TABLE_CONF_MAX_NEIGHBORS
-#define NBR_TABLE_CONF_MAX_NEIGHBORS 8	//original value: 8
+#define NBR_TABLE_CONF_MAX_NEIGHBORS 6	//original value: 8
 #undef UIP_CONF_ND6_SEND_NA
 #define UIP_CONF_ND6_SEND_NA 0
 #undef SICSLOWPAN_CONF_FRAG
